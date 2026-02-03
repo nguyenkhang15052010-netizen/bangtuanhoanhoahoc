@@ -1,0 +1,3313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Tuần Hoàn 3D - Lớp 10</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0c0;
+            --glow-cyan: #00f5ff;
+            --glow-purple: #b829ff;
+            --glow-pink: #ff29a8;
+
+            /* Element category colors */
+            --alkali: #ff6b6b;
+            --alkaline: #ffa94d;
+            --transition: #ffd43b;
+            --post-transition: #69db7c;
+            --metalloid: #38d9a9;
+            --nonmetal: #4dabf7;
+            --halogen: #748ffc;
+            --noble: #da77f2;
+            --lanthanide: #f783ac;
+            --actinide: #e599f7;
+            --unknown: #868e96;
+        }
+
+        .light {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a6a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(184, 41, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 41, 168, 0.05) 0%, transparent 70%),
+                var(--bg-primary);
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--glow-cyan);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 20px;
+            perspective: 1000px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--glow-cyan), var(--glow-purple), var(--glow-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+            transform: rotateX(10deg);
+        }
+
+        @keyframes titleGlow {
+            from { filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.5)); }
+            to { filter: drop-shadow(0 0 40px rgba(184, 41, 255, 0.8)); }
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 30px;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: var(--text-primary);
+            width: 250px;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(184, 41, 255, 0.3);
+            border-radius: 30px;
+            padding: 12px 20px;
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(184, 41, 255, 0.3);
+            border-color: var(--glow-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(184, 41, 255, 0.4);
+        }
+
+        /* Periodic Table Container */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            padding: 10px;
+            perspective: 2000px;
+        }
+
+        .periodic-table {
+            display: grid;
+            grid-template-columns: 30px repeat(18, minmax(45px, 1fr));
+            gap: 3px;
+            max-width: 1450px;
+            margin: 0 auto;
+            padding: 10px;
+            transform-style: preserve-3d;
+            animation: tableFloat 8s ease-in-out infinite;
+        }
+
+        /* Period and Group Labels */
+        .period-label, .group-label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--glow-cyan);
+            text-shadow: 0 0 10px var(--glow-cyan);
+            background: rgba(0, 245, 255, 0.08);
+            border-radius: 6px;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+        }
+
+        .period-label {
+            min-height: 45px;
+        }
+
+        .group-label {
+            min-height: 28px;
+            font-size: 0.75rem;
+        }
+
+        .dark .period-label, .dark .group-label {
+            color: var(--glow-cyan);
+        }
+
+        @keyframes tableFloat {
+            0%, 100% { transform: rotateX(2deg) rotateY(0deg); }
+            50% { transform: rotateX(-2deg) rotateY(1deg); }
+        }
+
+        /* Element Card */
+        .element {
+            aspect-ratio: 1;
+            min-width: 45px;
+            min-height: 45px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        .element::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            border-radius: 8px;
+            z-index: -1;
+        }
+
+        .element::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 40%,
+                rgba(255,255,255,0.1) 50%,
+                transparent 60%
+            );
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+
+        .element:hover::after {
+            animation: shine 0.6s forwards;
+        }
+
+        @keyframes shine {
+            to { transform: rotate(45deg) translateY(100%); opacity: 1; }
+        }
+
+        .element:hover {
+            transform: translateZ(30px) scale(1.15) rotateY(5deg);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 30px var(--element-color, var(--glow-cyan)),
+                inset 0 0 20px rgba(255,255,255,0.1);
+            z-index: 100;
+        }
+
+        .element.hidden {
+            opacity: 0.15;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+        .element .number {
+            font-size: clamp(8px, 1.5vw, 10px);
+            opacity: 0.8;
+            position: absolute;
+            top: 3px;
+            left: 5px;
+        }
+
+        .element .symbol {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(14px, 2.5vw, 20px);
+            font-weight: 700;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .element .name {
+            font-size: clamp(6px, 1vw, 8px);
+            opacity: 0.7;
+            text-align: center;
+            max-width: 95%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .element .mass {
+            font-size: clamp(6px, 1vw, 8px);
+            opacity: 0.6;
+        }
+
+        /* Element Categories */
+        .element.alkali {
+            --element-color: var(--alkali);
+            background: linear-gradient(145deg, rgba(255, 107, 107, 0.4), rgba(255, 107, 107, 0.2));
+            border-color: var(--alkali);
+        }
+        .element.alkaline {
+            --element-color: var(--alkaline);
+            background: linear-gradient(145deg, rgba(255, 169, 77, 0.4), rgba(255, 169, 77, 0.2));
+            border-color: var(--alkaline);
+        }
+        .element.transition {
+            --element-color: var(--transition);
+            background: linear-gradient(145deg, rgba(255, 212, 59, 0.4), rgba(255, 212, 59, 0.2));
+            border-color: var(--transition);
+        }
+        .element.post-transition {
+            --element-color: var(--post-transition);
+            background: linear-gradient(145deg, rgba(105, 219, 124, 0.4), rgba(105, 219, 124, 0.2));
+            border-color: var(--post-transition);
+        }
+        .element.metalloid {
+            --element-color: var(--metalloid);
+            background: linear-gradient(145deg, rgba(56, 217, 169, 0.4), rgba(56, 217, 169, 0.2));
+            border-color: var(--metalloid);
+        }
+        .element.nonmetal {
+            --element-color: var(--nonmetal);
+            background: linear-gradient(145deg, rgba(77, 171, 247, 0.4), rgba(77, 171, 247, 0.2));
+            border-color: var(--nonmetal);
+        }
+        .element.halogen {
+            --element-color: var(--halogen);
+            background: linear-gradient(145deg, rgba(116, 143, 252, 0.4), rgba(116, 143, 252, 0.2));
+            border-color: var(--halogen);
+        }
+        .element.noble {
+            --element-color: var(--noble);
+            background: linear-gradient(145deg, rgba(218, 119, 242, 0.4), rgba(218, 119, 242, 0.2));
+            border-color: var(--noble);
+        }
+        .element.lanthanide {
+            --element-color: var(--lanthanide);
+            background: linear-gradient(145deg, rgba(247, 131, 172, 0.4), rgba(247, 131, 172, 0.2));
+            border-color: var(--lanthanide);
+        }
+        .element.actinide {
+            --element-color: var(--actinide);
+            background: linear-gradient(145deg, rgba(229, 153, 247, 0.4), rgba(229, 153, 247, 0.2));
+            border-color: var(--actinide);
+        }
+        .element.unknown {
+            --element-color: var(--unknown);
+            background: linear-gradient(145deg, rgba(134, 142, 150, 0.4), rgba(134, 142, 150, 0.2));
+            border-color: var(--unknown);
+        }
+
+        /* Lanthanides/Actinides row */
+        .lanthanide-row, .actinide-row {
+            grid-column: 3 / 18;
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            gap: 3px;
+            margin-top: 10px;
+        }
+
+        .series-label {
+            grid-column: 1 / 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .legend-item:hover {
+            transform: scale(1.05);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: linear-gradient(145deg, var(--bg-secondary), var(--bg-primary));
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 850px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.8) rotateX(10deg);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) rotateX(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 107, 107, 0.5);
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .modal-symbol {
+            width: 100px;
+            height: 100px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px var(--element-color); }
+            50% { box-shadow: 0 0 40px var(--element-color), 0 0 60px var(--element-color); }
+        }
+
+        .modal-symbol .number {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .modal-symbol .symbol {
+            font-size: 40px;
+            font-weight: 900;
+        }
+
+        .modal-title {
+            flex: 1;
+        }
+
+        .modal-title h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pronunciation-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .ipa-text {
+            font-family: 'Noto Sans', 'Segoe UI', sans-serif;
+            font-size: 16px;
+            color: var(--glow-cyan);
+            font-style: italic;
+            background: rgba(0, 245, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 245, 255, 0.3);
+        }
+
+        .speak-btn {
+            background: linear-gradient(135deg, var(--glow-cyan), var(--glow-purple));
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
+        }
+
+        .speak-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 245, 255, 0.5);
+        }
+
+        .speak-btn:active {
+            transform: scale(0.95);
+        }
+
+        .speak-btn.speaking {
+            animation: speakPulse 0.5s ease infinite;
+        }
+
+        @keyframes speakPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3); }
+            50% { box-shadow: 0 4px 30px rgba(0, 245, 255, 0.8); }
+        }
+
+        .modal-title .category {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* New Modal Body Layout */
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .modal-left {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .atom-models-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+        }
+
+        .atom-model-wrapper {
+            text-align: center;
+        }
+
+        .atom-model-wrapper .model-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .modal-right {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            flex: 1;
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.05);
+            padding: 12px 15px;
+            border-radius: 12px;
+            border-left: 3px solid var(--glow-cyan);
+        }
+
+        .info-card.full {
+            grid-column: 1 / -1;
+        }
+
+        .info-card label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .info-card .value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .electron-config {
+            font-family: monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+
+        /* Fun fact section */
+        .fun-fact {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+        }
+
+        .fun-fact-label {
+            font-size: 11px;
+            color: var(--glow-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .fun-fact-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        /* 3D Atom Model */
+        .atom-model {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: radial-gradient(circle at center, rgba(20, 20, 40, 0.8), rgba(10, 10, 26, 0.95));
+        }
+
+        .atom-model canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .periodic-table {
+                grid-template-columns: 25px repeat(18, 40px);
+            }
+
+            .element {
+                min-width: 40px;
+                min-height: 40px;
+            }
+
+            .period-label {
+                min-height: 40px;
+                font-size: 0.75rem;
+            }
+
+            .group-label {
+                min-height: 24px;
+                font-size: 0.65rem;
+            }
+
+            .modal-body {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .search-box input {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--glow-cyan), var(--glow-purple));
+            border-radius: 4px;
+        }
+
+        /* Empty cells */
+        .empty {
+            visibility: hidden;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 30px;
+            color: var(--text-primary);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.3), rgba(184, 41, 255, 0.3));
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
+        }
+
+        .tab-icon {
+            font-size: 1.2rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Game Container */
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            background: linear-gradient(135deg, var(--glow-cyan), var(--glow-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .game-desc {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Game Stats */
+        .game-stats {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 15px;
+            padding: 15px 20px;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .stat-icon {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            display: block;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: var(--glow-cyan);
+            margin-top: 5px;
+        }
+
+        /* Game Controls */
+        .game-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .difficulty-selector,
+        .element-range-selector,
+        .quiz-mode-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .difficulty-selector label,
+        .element-range-selector label,
+        .quiz-mode-selector label {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .diff-btn, .mode-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(184, 41, 255, 0.3);
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .diff-btn:hover, .mode-btn:hover {
+            background: rgba(184, 41, 255, 0.2);
+        }
+
+        .diff-btn.active, .mode-btn.active {
+            background: rgba(184, 41, 255, 0.4);
+            border-color: var(--glow-purple);
+            box-shadow: 0 0 15px rgba(184, 41, 255, 0.4);
+        }
+
+        .element-range-selector select {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .element-range-selector select option {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .start-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--glow-cyan), var(--glow-purple));
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.5);
+        }
+
+        /* Memory Board */
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            min-height: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched {
+            animation: matchPulse 0.5s ease;
+        }
+
+        @keyframes matchPulse {
+            0%, 100% { transform: rotateY(180deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(1.1); }
+        }
+
+        .memory-card.matched .card-front {
+            background: linear-gradient(135deg, rgba(105, 219, 124, 0.6), rgba(56, 217, 169, 0.6));
+            box-shadow: 0 0 30px rgba(105, 219, 124, 0.8);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .card-back {
+            background: linear-gradient(145deg, rgba(0, 245, 255, 0.3), rgba(184, 41, 255, 0.3));
+            border: 2px solid rgba(0, 245, 255, 0.5);
+            font-size: 2rem;
+        }
+
+        .card-back::after {
+            content: '?';
+            font-size: 2.5rem;
+            color: var(--glow-cyan);
+            text-shadow: 0 0 20px var(--glow-cyan);
+        }
+
+        .card-front {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            border: 2px solid;
+            transform: rotateY(180deg);
+        }
+
+        .card-front.symbol-card {
+            border-color: var(--glow-cyan);
+        }
+
+        .card-front.name-card {
+            border-color: var(--glow-purple);
+        }
+
+        .card-symbol {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 900;
+            color: var(--glow-cyan);
+            text-shadow: 0 0 15px var(--glow-cyan);
+        }
+
+        .card-number {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-bottom: 3px;
+        }
+
+        .card-name {
+            font-size: clamp(0.7rem, 2vw, 1rem);
+            color: var(--glow-purple);
+            text-shadow: 0 0 10px var(--glow-purple);
+            text-align: center;
+            padding: 5px;
+        }
+
+        /* Game Message */
+        .game-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            min-height: 60px;
+        }
+
+        .game-message.success {
+            color: #69db7c;
+        }
+
+        .game-message.info {
+            color: var(--glow-cyan);
+        }
+
+        /* Quiz Area */
+        .quiz-area {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .question-symbol {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 10vw, 5rem);
+            font-weight: 900;
+            color: var(--glow-cyan);
+            text-shadow: 0 0 30px var(--glow-cyan);
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-option {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(184, 41, 255, 0.3);
+            border-radius: 15px;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover:not(.disabled) {
+            background: rgba(184, 41, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+        .quiz-option.correct {
+            background: rgba(105, 219, 124, 0.5);
+            border-color: #69db7c;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .quiz-option.wrong {
+            background: rgba(255, 107, 107, 0.5);
+            border-color: #ff6b6b;
+            animation: shake 0.5s ease;
+        }
+
+        .quiz-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .quiz-feedback {
+            font-size: 1.1rem;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            min-height: 50px;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(105, 219, 124, 0.2);
+            color: #69db7c;
+        }
+
+        .quiz-feedback.wrong {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        .quiz-progress {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--glow-cyan), var(--glow-purple));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Victory Modal */
+        .victory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .victory-content {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(145deg, var(--bg-secondary), var(--bg-primary));
+            border: 3px solid var(--glow-cyan);
+            border-radius: 30px;
+            max-width: 400px;
+            animation: victoryPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes victoryPop {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .victory-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .victory-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--glow-cyan);
+            margin-bottom: 20px;
+        }
+
+        .victory-stats {
+            margin-bottom: 25px;
+        }
+
+        .victory-stat {
+            font-size: 1.1rem;
+            margin: 10px 0;
+            color: var(--text-secondary);
+        }
+
+        .victory-stat span {
+            color: var(--glow-purple);
+            font-weight: 700;
+        }
+
+        .victory-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--glow-cyan), var(--glow-purple));
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .victory-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 245, 255, 0.5);
+        }
+
+        /* Loading animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-atom {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loadingPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--glow-cyan);
+            letter-spacing: 3px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="loading-atom">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="8" fill="#00f5ff"/>
+                <ellipse cx="50" cy="50" rx="45" ry="20" fill="none" stroke="#00f5ff" stroke-width="2" opacity="0.6">
+                    <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="2s" repeatCount="indefinite"/>
+                </ellipse>
+                <ellipse cx="50" cy="50" rx="45" ry="20" fill="none" stroke="#b829ff" stroke-width="2" opacity="0.6">
+                    <animateTransform attributeName="transform" type="rotate" from="60 50 50" to="420 50 50" dur="2.5s" repeatCount="indefinite"/>
+                </ellipse>
+                <ellipse cx="50" cy="50" rx="45" ry="20" fill="none" stroke="#ff29a8" stroke-width="2" opacity="0.6">
+                    <animateTransform attributeName="transform" type="rotate" from="120 50 50" to="480 50 50" dur="3s" repeatCount="indefinite"/>
+                </ellipse>
+            </svg>
+        </div>
+        <div class="loading-text">ĐANG TẢI...</div>
+    </div>
+
+    <!-- Background -->
+    <div class="bg-animation"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header>
+        <h1>🔬 Bảng Tuần Hoàn Hóa Học</h1>
+        <p class="subtitle">Khám phá 118 nguyên tố - Chương trình Hóa học lớp 10</p>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="table">
+            <span class="tab-icon">📊</span>
+            <span>Bảng Tuần Hoàn</span>
+        </button>
+        <button class="tab-btn" data-tab="memory">
+            <span class="tab-icon">🎴</span>
+            <span>Trò Chơi Lật Thẻ</span>
+        </button>
+        <button class="tab-btn" data-tab="quiz">
+            <span class="tab-icon">❓</span>
+            <span>Đố Vui Nguyên Tố</span>
+        </button>
+    </nav>
+
+    <!-- Tab: Table -->
+    <div id="tableTab" class="tab-content active">
+        <!-- Controls -->
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Tìm nguyên tố...">
+            </div>
+            <button class="filter-btn active" data-filter="all">Tất cả</button>
+            <button class="filter-btn" data-filter="metal">Kim loại</button>
+            <button class="filter-btn" data-filter="nonmetal">Phi kim</button>
+            <button class="filter-btn" data-filter="gas">Khí hiếm</button>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item" data-category="alkali">
+                <div class="legend-color" style="background: var(--alkali)"></div>
+                <span>Kim loại kiềm</span>
+            </div>
+            <div class="legend-item" data-category="alkaline">
+                <div class="legend-color" style="background: var(--alkaline)"></div>
+                <span>Kim loại kiềm thổ</span>
+            </div>
+            <div class="legend-item" data-category="transition">
+                <div class="legend-color" style="background: var(--transition)"></div>
+                <span>Kim loại chuyển tiếp</span>
+            </div>
+            <div class="legend-item" data-category="post-transition">
+                <div class="legend-color" style="background: var(--post-transition)"></div>
+                <span>Kim loại yếu</span>
+            </div>
+            <div class="legend-item" data-category="metalloid">
+                <div class="legend-color" style="background: var(--metalloid)"></div>
+                <span>Á kim</span>
+            </div>
+            <div class="legend-item" data-category="nonmetal">
+                <div class="legend-color" style="background: var(--nonmetal)"></div>
+                <span>Phi kim</span>
+            </div>
+            <div class="legend-item" data-category="halogen">
+                <div class="legend-color" style="background: var(--halogen)"></div>
+                <span>Halogen</span>
+            </div>
+            <div class="legend-item" data-category="noble">
+                <div class="legend-color" style="background: var(--noble)"></div>
+                <span>Khí hiếm</span>
+            </div>
+            <div class="legend-item" data-category="lanthanide">
+                <div class="legend-color" style="background: var(--lanthanide)"></div>
+                <span>Lantanit</span>
+            </div>
+            <div class="legend-item" data-category="actinide">
+                <div class="legend-color" style="background: var(--actinide)"></div>
+                <span>Actinit</span>
+            </div>
+        </div>
+
+        <!-- Periodic Table -->
+        <div class="table-container">
+            <div class="periodic-table" id="periodicTable"></div>
+        </div>
+    </div>
+
+    <!-- Tab: Memory Game -->
+    <div id="memoryTab" class="tab-content">
+        <div class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">🎴 Trò Chơi Lật Thẻ</h2>
+                <p class="game-desc">Ghép ký hiệu nguyên tố với tên của chúng!</p>
+            </div>
+
+            <div class="game-stats">
+                <div class="stat-box">
+                    <span class="stat-icon">⏱️</span>
+                    <span class="stat-label">Thời gian</span>
+                    <span class="stat-value" id="memoryTimer">00:00</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-icon">🎯</span>
+                    <span class="stat-label">Lượt lật</span>
+                    <span class="stat-value" id="memoryMoves">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-icon">✅</span>
+                    <span class="stat-label">Đã ghép</span>
+                    <span class="stat-value" id="memoryMatches">0/<span id="memoryTotal">0</span></span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-icon">⭐</span>
+                    <span class="stat-label">Điểm</span>
+                    <span class="stat-value" id="memoryScore">0</span>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <div class="difficulty-selector">
+                    <label>Độ khó:</label>
+                    <button class="diff-btn active" data-pairs="6">Dễ (6 cặp)</button>
+                    <button class="diff-btn" data-pairs="10">Trung bình (10 cặp)</button>
+                    <button class="diff-btn" data-pairs="15">Khó (15 cặp)</button>
+                </div>
+                <div class="element-range-selector">
+                    <label>Phạm vi nguyên tố:</label>
+                    <select id="elementRange">
+                        <option value="1-20">Nguyên tố 1-20 (Phổ biến)</option>
+                        <option value="1-36">Chu kỳ 1-4 (1-36)</option>
+                        <option value="1-54">Chu kỳ 1-5 (1-54)</option>
+                        <option value="alkali">Kim loại kiềm</option>
+                        <option value="halogen">Halogen</option>
+                        <option value="noble">Khí hiếm</option>
+                        <option value="random">Ngẫu nhiên</option>
+                    </select>
+                </div>
+                <button class="start-btn" id="startMemory">🚀 Bắt Đầu Chơi</button>
+            </div>
+
+            <div class="memory-board" id="memoryBoard"></div>
+
+            <div class="game-message" id="memoryMessage"></div>
+        </div>
+    </div>
+
+    <!-- Tab: Quiz Game -->
+    <div id="quizTab" class="tab-content">
+        <div class="game-container">
+            <div class="game-header">
+                <h2 class="game-title">❓ Đố Vui Nguyên Tố</h2>
+                <p class="game-desc">Trả lời nhanh để ghi điểm cao!</p>
+            </div>
+
+            <div class="game-stats">
+                <div class="stat-box">
+                    <span class="stat-icon">❓</span>
+                    <span class="stat-label">Câu hỏi</span>
+                    <span class="stat-value"><span id="quizCurrent">0</span>/<span id="quizTotalQ">10</span></span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-icon">✅</span>
+                    <span class="stat-label">Đúng</span>
+                    <span class="stat-value" id="quizCorrect">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-icon">⏱️</span>
+                    <span class="stat-label">Thời gian</span>
+                    <span class="stat-value" id="quizTimer">10</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-icon">⭐</span>
+                    <span class="stat-label">Điểm</span>
+                    <span class="stat-value" id="quizScore">0</span>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <div class="quiz-mode-selector">
+                    <label>Chế độ:</label>
+                    <button class="mode-btn active" data-mode="symbol">Ký hiệu → Tên</button>
+                    <button class="mode-btn" data-mode="name">Tên → Ký hiệu</button>
+                    <button class="mode-btn" data-mode="config">Cấu hình e⁻</button>
+                    <button class="mode-btn" data-mode="mixed">Hỗn hợp</button>
+                </div>
+                <button class="start-btn" id="startQuiz">🚀 Bắt Đầu</button>
+            </div>
+
+            <div class="quiz-area" id="quizArea">
+                <div class="quiz-question" id="quizQuestion">
+                    <div class="question-symbol" id="questionSymbol"></div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+                <div class="quiz-options" id="quizOptions"></div>
+                <div class="quiz-feedback" id="quizFeedback"></div>
+            </div>
+
+            <div class="quiz-progress">
+                <div class="progress-bar" id="quizProgress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="elementModal">
+            <button class="modal-close" id="modalClose">×</button>
+
+            <!-- Header: Symbol + Name/Pronunciation/Category -->
+            <div class="modal-header">
+                <div class="modal-symbol" id="modalSymbol">
+                    <span class="number" id="modalNumber"></span>
+                    <span class="symbol" id="modalSymbolText"></span>
+                </div>
+                <div class="modal-title">
+                    <h2 id="modalName"></h2>
+                    <div class="pronunciation-section">
+                        <span class="ipa-text" id="modalIPA"></span>
+                        <button class="speak-btn" id="speakBtn" title="Phát âm">🔊</button>
+                    </div>
+                    <div class="category" id="modalCategory"></div>
+                </div>
+            </div>
+
+            <!-- Body: Models on left, Info on right -->
+            <div class="modal-body">
+                <!-- Left side: Atom model -->
+                <div class="modal-left">
+                    <div class="atom-models-container">
+                        <div class="atom-model-wrapper">
+                            <div class="model-label">Mô hình 3D</div>
+                            <div class="atom-model" id="atomModel"></div>
+                        </div>
+                    </div>
+                    <!-- Fun fact at bottom of left side -->
+                    <div class="fun-fact">
+                        <div class="fun-fact-label">💡 Thông tin thú vị</div>
+                        <div class="fun-fact-text" id="modalFact"></div>
+                    </div>
+                </div>
+
+                <!-- Right side: Element properties -->
+                <div class="modal-right">
+                    <div class="modal-content">
+                        <div class="info-card">
+                            <label>Khối lượng nguyên tử</label>
+                            <div class="value" id="modalMass"></div>
+                        </div>
+                        <div class="info-card">
+                            <label>Độ âm điện</label>
+                            <div class="value" id="modalElectronegativity"></div>
+                        </div>
+                        <div class="info-card">
+                            <label>Chu kỳ</label>
+                            <div class="value" id="modalPeriod"></div>
+                        </div>
+                        <div class="info-card">
+                            <label>Nhóm</label>
+                            <div class="value" id="modalGroup"></div>
+                        </div>
+                        <div class="info-card">
+                            <label>Trạng thái</label>
+                            <div class="value" id="modalState"></div>
+                        </div>
+                        <div class="info-card">
+                            <label>Năm phát hiện</label>
+                            <div class="value" id="modalYear"></div>
+                        </div>
+                        <div class="info-card full">
+                            <label>Cấu hình electron</label>
+                            <div class="value electron-config" id="modalConfig"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Element data
+        const elements = [
+            // Period 1
+            { number: 1, symbol: "H", name: "Hydrogen", nameVi: "Hiđrô", mass: 1.008, category: "nonmetal", period: 1, group: 1, electronegativity: 2.20, state: "Khí", year: "1766", config: "1s¹", fact: "Nguyên tố phổ biến nhất trong vũ trụ, chiếm 75% khối lượng vật chất thông thường." },
+            { number: 2, symbol: "He", name: "Helium", nameVi: "Heli", mass: 4.003, category: "noble", period: 1, group: 18, electronegativity: null, state: "Khí", year: "1868", config: "1s²", fact: "Khí nhẹ thứ hai, được dùng cho khinh khí cầu và làm mát thiết bị siêu dẫn." },
+
+            // Period 2
+            { number: 3, symbol: "Li", name: "Lithium", nameVi: "Liti", mass: 6.941, category: "alkali", period: 2, group: 1, electronegativity: 0.98, state: "Rắn", year: "1817", config: "[He] 2s¹", fact: "Kim loại nhẹ nhất, được sử dụng rộng rãi trong pin lithium-ion." },
+            { number: 4, symbol: "Be", name: "Beryllium", nameVi: "Berili", mass: 9.012, category: "alkaline", period: 2, group: 2, electronegativity: 1.57, state: "Rắn", year: "1798", config: "[He] 2s²", fact: "Kim loại cứng, nhẹ, được dùng trong hợp kim hàng không vũ trụ." },
+            { number: 5, symbol: "B", name: "Boron", nameVi: "Bo", mass: 10.81, category: "metalloid", period: 2, group: 13, electronegativity: 2.04, state: "Rắn", year: "1808", config: "[He] 2s² 2p¹", fact: "Á kim quan trọng trong sản xuất thủy tinh borosilicate (Pyrex)." },
+            { number: 6, symbol: "C", name: "Carbon", nameVi: "Cacbon", mass: 12.01, category: "nonmetal", period: 2, group: 14, electronegativity: 2.55, state: "Rắn", year: "Cổ đại", config: "[He] 2s² 2p²", fact: "Cơ sở của sự sống, có thể tồn tại dưới nhiều dạng thù hình như kim cương, than chì." },
+            { number: 7, symbol: "N", name: "Nitrogen", nameVi: "Nitơ", mass: 14.01, category: "nonmetal", period: 2, group: 15, electronegativity: 3.04, state: "Khí", year: "1772", config: "[He] 2s² 2p³", fact: "Chiếm 78% khí quyển Trái Đất, cần thiết cho protein và DNA." },
+            { number: 8, symbol: "O", name: "Oxygen", nameVi: "Oxi", mass: 16.00, category: "nonmetal", period: 2, group: 16, electronegativity: 3.44, state: "Khí", year: "1774", config: "[He] 2s² 2p⁴", fact: "Nguyên tố thiết yếu cho hô hấp, chiếm 21% khí quyển Trái Đất." },
+            { number: 9, symbol: "F", name: "Fluorine", nameVi: "Flo", mass: 19.00, category: "halogen", period: 2, group: 17, electronegativity: 3.98, state: "Khí", year: "1886", config: "[He] 2s² 2p⁵", fact: "Nguyên tố có độ âm điện cao nhất, dùng trong kem đánh răng." },
+            { number: 10, symbol: "Ne", name: "Neon", nameVi: "Neon", mass: 20.18, category: "noble", period: 2, group: 18, electronegativity: null, state: "Khí", year: "1898", config: "[He] 2s² 2p⁶", fact: "Tạo ra ánh sáng đỏ-cam đặc trưng trong đèn neon." },
+
+            // Period 3
+            { number: 11, symbol: "Na", name: "Sodium", nameVi: "Natri", mass: 22.99, category: "alkali", period: 3, group: 1, electronegativity: 0.93, state: "Rắn", year: "1807", config: "[Ne] 3s¹", fact: "Kim loại mềm, phản ứng mạnh với nước, thành phần của muối ăn." },
+            { number: 12, symbol: "Mg", name: "Magnesium", nameVi: "Magiê", mass: 24.31, category: "alkaline", period: 3, group: 2, electronegativity: 1.31, state: "Rắn", year: "1755", config: "[Ne] 3s²", fact: "Kim loại nhẹ, được dùng trong pháo hoa và hợp kim máy bay." },
+            { number: 13, symbol: "Al", name: "Aluminium", nameVi: "Nhôm", mass: 26.98, category: "post-transition", period: 3, group: 13, electronegativity: 1.61, state: "Rắn", year: "1825", config: "[Ne] 3s² 3p¹", fact: "Kim loại phổ biến nhất trong vỏ Trái Đất, dùng làm lon nước ngọt." },
+            { number: 14, symbol: "Si", name: "Silicon", nameVi: "Silic", mass: 28.09, category: "metalloid", period: 3, group: 14, electronegativity: 1.90, state: "Rắn", year: "1824", config: "[Ne] 3s² 3p²", fact: "Nguyên liệu chính cho chip máy tính và pin mặt trời." },
+            { number: 15, symbol: "P", name: "Phosphorus", nameVi: "Photpho", mass: 30.97, category: "nonmetal", period: 3, group: 15, electronegativity: 2.19, state: "Rắn", year: "1669", config: "[Ne] 3s² 3p³", fact: "Cần thiết cho DNA và ATP, được dùng trong diêm và pháo hoa." },
+            { number: 16, symbol: "S", name: "Sulfur", nameVi: "Lưu huỳnh", mass: 32.07, category: "nonmetal", period: 3, group: 16, electronegativity: 2.58, state: "Rắn", year: "Cổ đại", config: "[Ne] 3s² 3p⁴", fact: "Có mùi đặc trưng (mùi trứng thối), dùng sản xuất axit sunfuric." },
+            { number: 17, symbol: "Cl", name: "Chlorine", nameVi: "Clo", mass: 35.45, category: "halogen", period: 3, group: 17, electronegativity: 3.16, state: "Khí", year: "1774", config: "[Ne] 3s² 3p⁵", fact: "Dùng khử trùng nước uống và hồ bơi." },
+            { number: 18, symbol: "Ar", name: "Argon", nameVi: "Argon", mass: 39.95, category: "noble", period: 3, group: 18, electronegativity: null, state: "Khí", year: "1894", config: "[Ne] 3s² 3p⁶", fact: "Khí trơ phổ biến nhất, dùng trong bóng đèn và hàn." },
+
+            // Period 4
+            { number: 19, symbol: "K", name: "Potassium", nameVi: "Kali", mass: 39.10, category: "alkali", period: 4, group: 1, electronegativity: 0.82, state: "Rắn", year: "1807", config: "[Ar] 4s¹", fact: "Cần thiết cho hoạt động cơ và thần kinh, có trong chuối." },
+            { number: 20, symbol: "Ca", name: "Calcium", nameVi: "Canxi", mass: 40.08, category: "alkaline", period: 4, group: 2, electronegativity: 1.00, state: "Rắn", year: "1808", config: "[Ar] 4s²", fact: "Thành phần chính của xương và răng, có nhiều trong sữa." },
+            { number: 21, symbol: "Sc", name: "Scandium", nameVi: "Scandi", mass: 44.96, category: "transition", period: 4, group: 3, electronegativity: 1.36, state: "Rắn", year: "1879", config: "[Ar] 3d¹ 4s²", fact: "Kim loại chuyển tiếp đầu tiên, dùng trong đèn hồ quang." },
+            { number: 22, symbol: "Ti", name: "Titanium", nameVi: "Titan", mass: 47.87, category: "transition", period: 4, group: 4, electronegativity: 1.54, state: "Rắn", year: "1791", config: "[Ar] 3d² 4s²", fact: "Kim loại nhẹ, bền, dùng trong máy bay và cấy ghép y tế." },
+            { number: 23, symbol: "V", name: "Vanadium", nameVi: "Vanadi", mass: 50.94, category: "transition", period: 4, group: 5, electronegativity: 1.63, state: "Rắn", year: "1801", config: "[Ar] 3d³ 4s²", fact: "Làm thép cứng hơn, dùng trong lò xo và công cụ." },
+            { number: 24, symbol: "Cr", name: "Chromium", nameVi: "Crom", mass: 52.00, category: "transition", period: 4, group: 6, electronegativity: 1.66, state: "Rắn", year: "1797", config: "[Ar] 3d⁵ 4s¹", fact: "Cho màu sáng bóng đặc trưng, dùng mạ kim loại." },
+            { number: 25, symbol: "Mn", name: "Manganese", nameVi: "Mangan", mass: 54.94, category: "transition", period: 4, group: 7, electronegativity: 1.55, state: "Rắn", year: "1774", config: "[Ar] 3d⁵ 4s²", fact: "Dùng trong sản xuất thép và pin khô." },
+            { number: 26, symbol: "Fe", name: "Iron", nameVi: "Sắt", mass: 55.85, category: "transition", period: 4, group: 8, electronegativity: 1.83, state: "Rắn", year: "Cổ đại", config: "[Ar] 3d⁶ 4s²", fact: "Kim loại được sử dụng nhiều nhất, cần thiết cho hemoglobin máu." },
+            { number: 27, symbol: "Co", name: "Cobalt", nameVi: "Coban", mass: 58.93, category: "transition", period: 4, group: 9, electronegativity: 1.88, state: "Rắn", year: "1735", config: "[Ar] 3d⁷ 4s²", fact: "Tạo màu xanh đặc trưng, dùng trong pin lithium-ion." },
+            { number: 28, symbol: "Ni", name: "Nickel", nameVi: "Niken", mass: 58.69, category: "transition", period: 4, group: 10, electronegativity: 1.91, state: "Rắn", year: "1751", config: "[Ar] 3d⁸ 4s²", fact: "Dùng trong tiền xu và thép không gỉ." },
+            { number: 29, symbol: "Cu", name: "Copper", nameVi: "Đồng", mass: 63.55, category: "transition", period: 4, group: 11, electronegativity: 1.90, state: "Rắn", year: "Cổ đại", config: "[Ar] 3d¹⁰ 4s¹", fact: "Dẫn điện tốt thứ hai sau bạc, dùng trong dây điện." },
+            { number: 30, symbol: "Zn", name: "Zinc", nameVi: "Kẽm", mass: 65.38, category: "transition", period: 4, group: 12, electronegativity: 1.65, state: "Rắn", year: "Cổ đại", config: "[Ar] 3d¹⁰ 4s²", fact: "Bảo vệ sắt khỏi gỉ, quan trọng cho hệ miễn dịch." },
+            { number: 31, symbol: "Ga", name: "Gallium", nameVi: "Gali", mass: 69.72, category: "post-transition", period: 4, group: 13, electronegativity: 1.81, state: "Rắn", year: "1875", config: "[Ar] 3d¹⁰ 4s² 4p¹", fact: "Nóng chảy trong lòng bàn tay, dùng trong LED." },
+            { number: 32, symbol: "Ge", name: "Germanium", nameVi: "Gecmani", mass: 72.63, category: "metalloid", period: 4, group: 14, electronegativity: 2.01, state: "Rắn", year: "1886", config: "[Ar] 3d¹⁰ 4s² 4p²", fact: "Chất bán dẫn quan trọng trong điện tử học." },
+            { number: 33, symbol: "As", name: "Arsenic", nameVi: "Asen", mass: 74.92, category: "metalloid", period: 4, group: 15, electronegativity: 2.18, state: "Rắn", year: "Cổ đại", config: "[Ar] 3d¹⁰ 4s² 4p³", fact: "Chất độc nổi tiếng trong lịch sử, dùng trong bảo quản gỗ." },
+            { number: 34, symbol: "Se", name: "Selenium", nameVi: "Selen", mass: 78.97, category: "nonmetal", period: 4, group: 16, electronegativity: 2.55, state: "Rắn", year: "1817", config: "[Ar] 3d¹⁰ 4s² 4p⁴", fact: "Vi lượng cần thiết cho cơ thể, dùng trong dầu gội trị gàu." },
+            { number: 35, symbol: "Br", name: "Bromine", nameVi: "Brom", mass: 79.90, category: "halogen", period: 4, group: 17, electronegativity: 2.96, state: "Lỏng", year: "1826", config: "[Ar] 3d¹⁰ 4s² 4p⁵", fact: "Một trong hai nguyên tố lỏng ở nhiệt độ phòng." },
+            { number: 36, symbol: "Kr", name: "Krypton", nameVi: "Kripton", mass: 83.80, category: "noble", period: 4, group: 18, electronegativity: 3.00, state: "Khí", year: "1898", config: "[Ar] 3d¹⁰ 4s² 4p⁶", fact: "Không liên quan đến kryptonite của Superman!" },
+
+            // Period 5
+            { number: 37, symbol: "Rb", name: "Rubidium", nameVi: "Rubidi", mass: 85.47, category: "alkali", period: 5, group: 1, electronegativity: 0.82, state: "Rắn", year: "1861", config: "[Kr] 5s¹", fact: "Dùng trong đồng hồ nguyên tử và pháo hoa màu tím." },
+            { number: 38, symbol: "Sr", name: "Strontium", nameVi: "Stronti", mass: 87.62, category: "alkaline", period: 5, group: 2, electronegativity: 0.95, state: "Rắn", year: "1790", config: "[Kr] 5s²", fact: "Tạo màu đỏ trong pháo hoa." },
+            { number: 39, symbol: "Y", name: "Yttrium", nameVi: "Ytri", mass: 88.91, category: "transition", period: 5, group: 3, electronegativity: 1.22, state: "Rắn", year: "1794", config: "[Kr] 4d¹ 5s²", fact: "Dùng trong TV màu và LED trắng." },
+            { number: 40, symbol: "Zr", name: "Zirconium", nameVi: "Zirconi", mass: 91.22, category: "transition", period: 5, group: 4, electronegativity: 1.33, state: "Rắn", year: "1789", config: "[Kr] 4d² 5s²", fact: "Dùng trong lò phản ứng hạt nhân và đá quý nhân tạo." },
+            { number: 41, symbol: "Nb", name: "Niobium", nameVi: "Niobi", mass: 92.91, category: "transition", period: 5, group: 5, electronegativity: 1.6, state: "Rắn", year: "1801", config: "[Kr] 4d⁴ 5s¹", fact: "Dùng trong hợp kim siêu dẫn và trang sức." },
+            { number: 42, symbol: "Mo", name: "Molybdenum", nameVi: "Molypđen", mass: 95.95, category: "transition", period: 5, group: 6, electronegativity: 2.16, state: "Rắn", year: "1781", config: "[Kr] 4d⁵ 5s¹", fact: "Làm thép cứng và bền nhiệt, cần thiết cho enzyme." },
+            { number: 43, symbol: "Tc", name: "Technetium", nameVi: "Tecneti", mass: 98, category: "transition", period: 5, group: 7, electronegativity: 1.9, state: "Rắn", year: "1937", config: "[Kr] 4d⁵ 5s²", fact: "Nguyên tố đầu tiên được tổng hợp nhân tạo." },
+            { number: 44, symbol: "Ru", name: "Ruthenium", nameVi: "Ruteni", mass: 101.1, category: "transition", period: 5, group: 8, electronegativity: 2.2, state: "Rắn", year: "1844", config: "[Kr] 4d⁷ 5s¹", fact: "Kim loại quý hiếm, dùng trong đầu bút máy cao cấp." },
+            { number: 45, symbol: "Rh", name: "Rhodium", nameVi: "Rođi", mass: 102.9, category: "transition", period: 5, group: 9, electronegativity: 2.28, state: "Rắn", year: "1803", config: "[Kr] 4d⁸ 5s¹", fact: "Kim loại đắt nhất thế giới, dùng trong bộ chuyển đổi xúc tác ô tô." },
+            { number: 46, symbol: "Pd", name: "Palladium", nameVi: "Palađi", mass: 106.4, category: "transition", period: 5, group: 10, electronegativity: 2.20, state: "Rắn", year: "1803", config: "[Kr] 4d¹⁰", fact: "Hấp thụ hydro gấp 900 lần thể tích, dùng trong xúc tác ô tô." },
+            { number: 47, symbol: "Ag", name: "Silver", nameVi: "Bạc", mass: 107.9, category: "transition", period: 5, group: 11, electronegativity: 1.93, state: "Rắn", year: "Cổ đại", config: "[Kr] 4d¹⁰ 5s¹", fact: "Dẫn điện tốt nhất, có tính kháng khuẩn tự nhiên." },
+            { number: 48, symbol: "Cd", name: "Cadmium", nameVi: "Cađimi", mass: 112.4, category: "transition", period: 5, group: 12, electronegativity: 1.69, state: "Rắn", year: "1817", config: "[Kr] 4d¹⁰ 5s²", fact: "Dùng trong pin NiCd, độc hại với môi trường." },
+            { number: 49, symbol: "In", name: "Indium", nameVi: "Inđi", mass: 114.8, category: "post-transition", period: 5, group: 13, electronegativity: 1.78, state: "Rắn", year: "1863", config: "[Kr] 4d¹⁰ 5s² 5p¹", fact: "Dùng trong màn hình cảm ứng và TV phẳng." },
+            { number: 50, symbol: "Sn", name: "Tin", nameVi: "Thiếc", mass: 118.7, category: "post-transition", period: 5, group: 14, electronegativity: 1.96, state: "Rắn", year: "Cổ đại", config: "[Kr] 4d¹⁰ 5s² 5p²", fact: "Dùng làm hộp đựng thực phẩm và hàn điện tử." },
+            { number: 51, symbol: "Sb", name: "Antimony", nameVi: "Antimon", mass: 121.8, category: "metalloid", period: 5, group: 15, electronegativity: 2.05, state: "Rắn", year: "Cổ đại", config: "[Kr] 4d¹⁰ 5s² 5p³", fact: "Làm chì trong pin acid và chống cháy." },
+            { number: 52, symbol: "Te", name: "Tellurium", nameVi: "Telu", mass: 127.6, category: "metalloid", period: 5, group: 16, electronegativity: 2.1, state: "Rắn", year: "1783", config: "[Kr] 4d¹⁰ 5s² 5p⁴", fact: "Dùng trong đĩa DVD-RW và pin mặt trời." },
+            { number: 53, symbol: "I", name: "Iodine", nameVi: "Iot", mass: 126.9, category: "halogen", period: 5, group: 17, electronegativity: 2.66, state: "Rắn", year: "1811", config: "[Kr] 4d¹⁰ 5s² 5p⁵", fact: "Cần thiết cho tuyến giáp, dùng sát trùng vết thương." },
+            { number: 54, symbol: "Xe", name: "Xenon", nameVi: "Xenon", mass: 131.3, category: "noble", period: 5, group: 18, electronegativity: 2.60, state: "Khí", year: "1898", config: "[Kr] 4d¹⁰ 5s² 5p⁶", fact: "Dùng trong đèn pha ô tô và gây mê trong y tế." },
+
+            // Period 6
+            { number: 55, symbol: "Cs", name: "Cesium", nameVi: "Xesi", mass: 132.9, category: "alkali", period: 6, group: 1, electronegativity: 0.79, state: "Rắn", year: "1860", config: "[Xe] 6s¹", fact: "Kim loại có độ âm điện thấp nhất, dùng trong đồng hồ nguyên tử." },
+            { number: 56, symbol: "Ba", name: "Barium", nameVi: "Bari", mass: 137.3, category: "alkaline", period: 6, group: 2, electronegativity: 0.89, state: "Rắn", year: "1808", config: "[Xe] 6s²", fact: "Tạo màu xanh lá trong pháo hoa, dùng chụp X-quang đường tiêu hóa." },
+            // Lanthanides placeholder
+            { number: 57, symbol: "La", name: "Lanthanum", nameVi: "Lantan", mass: 138.9, category: "lanthanide", period: 6, group: 3, electronegativity: 1.10, state: "Rắn", year: "1839", config: "[Xe] 5d¹ 6s²", fact: "Dùng trong pin hybrid và thấu kính máy ảnh." },
+            { number: 72, symbol: "Hf", name: "Hafnium", nameVi: "Hafni", mass: 178.5, category: "transition", period: 6, group: 4, electronegativity: 1.3, state: "Rắn", year: "1923", config: "[Xe] 4f¹⁴ 5d² 6s²", fact: "Dùng trong thanh điều khiển lò phản ứng hạt nhân." },
+            { number: 73, symbol: "Ta", name: "Tantalum", nameVi: "Tantan", mass: 180.9, category: "transition", period: 6, group: 5, electronegativity: 1.5, state: "Rắn", year: "1802", config: "[Xe] 4f¹⁴ 5d³ 6s²", fact: "Dùng trong tụ điện điện thoại và cấy ghép y tế." },
+            { number: 74, symbol: "W", name: "Tungsten", nameVi: "Vonfram", mass: 183.8, category: "transition", period: 6, group: 6, electronegativity: 2.36, state: "Rắn", year: "1783", config: "[Xe] 4f¹⁴ 5d⁴ 6s²", fact: "Kim loại có nhiệt độ nóng chảy cao nhất (3422°C)." },
+            { number: 75, symbol: "Re", name: "Rhenium", nameVi: "Reni", mass: 186.2, category: "transition", period: 6, group: 7, electronegativity: 1.9, state: "Rắn", year: "1925", config: "[Xe] 4f¹⁴ 5d⁵ 6s²", fact: "Nguyên tố hiếm, dùng trong động cơ phản lực." },
+            { number: 76, symbol: "Os", name: "Osmium", nameVi: "Osmi", mass: 190.2, category: "transition", period: 6, group: 8, electronegativity: 2.2, state: "Rắn", year: "1803", config: "[Xe] 4f¹⁴ 5d⁶ 6s²", fact: "Nguyên tố có mật độ cao nhất trong các nguyên tố." },
+            { number: 77, symbol: "Ir", name: "Iridium", nameVi: "Iriđi", mass: 192.2, category: "transition", period: 6, group: 9, electronegativity: 2.20, state: "Rắn", year: "1803", config: "[Xe] 4f¹⁴ 5d⁷ 6s²", fact: "Kim loại chống ăn mòn tốt nhất, dùng trong bugi cao cấp." },
+            { number: 78, symbol: "Pt", name: "Platinum", nameVi: "Platin", mass: 195.1, category: "transition", period: 6, group: 10, electronegativity: 2.28, state: "Rắn", year: "1735", config: "[Xe] 4f¹⁴ 5d⁹ 6s¹", fact: "Kim loại quý, dùng trong trang sức và xúc tác ô tô." },
+            { number: 79, symbol: "Au", name: "Gold", nameVi: "Vàng", mass: 197.0, category: "transition", period: 6, group: 11, electronegativity: 2.54, state: "Rắn", year: "Cổ đại", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", fact: "Kim loại quý được ưa chuộng nhất, không bị oxy hóa trong không khí." },
+            { number: 80, symbol: "Hg", name: "Mercury", nameVi: "Thủy ngân", mass: 200.6, category: "transition", period: 6, group: 12, electronegativity: 2.00, state: "Lỏng", year: "Cổ đại", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s²", fact: "Kim loại lỏng duy nhất ở nhiệt độ phòng." },
+            { number: 81, symbol: "Tl", name: "Thallium", nameVi: "Tali", mass: 204.4, category: "post-transition", period: 6, group: 13, electronegativity: 1.62, state: "Rắn", year: "1861", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹", fact: "Rất độc, từng được dùng làm thuốc diệt chuột." },
+            { number: 82, symbol: "Pb", name: "Lead", nameVi: "Chì", mass: 207.2, category: "post-transition", period: 6, group: 14, electronegativity: 1.87, state: "Rắn", year: "Cổ đại", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²", fact: "Từng dùng trong xăng và sơn, nay hạn chế vì độc hại." },
+            { number: 83, symbol: "Bi", name: "Bismuth", nameVi: "Bitmut", mass: 209.0, category: "post-transition", period: 6, group: 15, electronegativity: 2.02, state: "Rắn", year: "1753", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³", fact: "Tạo tinh thể cầu vồng đẹp, dùng trong thuốc dạ dày." },
+            { number: 84, symbol: "Po", name: "Polonium", nameVi: "Poloni", mass: 209, category: "metalloid", period: 6, group: 16, electronegativity: 2.0, state: "Rắn", year: "1898", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴", fact: "Phóng xạ mạnh, được Marie Curie phát hiện." },
+            { number: 85, symbol: "At", name: "Astatine", nameVi: "Atatin", mass: 210, category: "halogen", period: 6, group: 17, electronegativity: 2.2, state: "Rắn", year: "1940", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵", fact: "Nguyên tố tự nhiên hiếm nhất trên Trái Đất." },
+            { number: 86, symbol: "Rn", name: "Radon", nameVi: "Rađon", mass: 222, category: "noble", period: 6, group: 18, electronegativity: 2.2, state: "Khí", year: "1900", config: "[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶", fact: "Khí phóng xạ, có thể tích tụ trong tầng hầm nhà." },
+
+            // Period 7
+            { number: 87, symbol: "Fr", name: "Francium", nameVi: "Franxi", mass: 223, category: "alkali", period: 7, group: 1, electronegativity: 0.7, state: "Rắn", year: "1939", config: "[Rn] 7s¹", fact: "Kim loại hoạt động mạnh nhất, cực kỳ hiếm và phóng xạ." },
+            { number: 88, symbol: "Ra", name: "Radium", nameVi: "Rađi", mass: 226, category: "alkaline", period: 7, group: 2, electronegativity: 0.9, state: "Rắn", year: "1898", config: "[Rn] 7s²", fact: "Phát sáng trong bóng tối, từng dùng trong đồng hồ dạ quang." },
+            { number: 89, symbol: "Ac", name: "Actinium", nameVi: "Actini", mass: 227, category: "actinide", period: 7, group: 3, electronegativity: 1.1, state: "Rắn", year: "1899", config: "[Rn] 6d¹ 7s²", fact: "Nguyên tố đầu tiên của họ actinide, phát sáng xanh nhạt." },
+            { number: 104, symbol: "Rf", name: "Rutherfordium", nameVi: "Rutherforđi", mass: 267, category: "transition", period: 7, group: 4, electronegativity: null, state: "Rắn", year: "1969", config: "[Rn] 5f¹⁴ 6d² 7s²", fact: "Đặt theo tên Ernest Rutherford, cha đẻ vật lý hạt nhân." },
+            { number: 105, symbol: "Db", name: "Dubnium", nameVi: "Dubni", mass: 268, category: "transition", period: 7, group: 5, electronegativity: null, state: "Rắn", year: "1970", config: "[Rn] 5f¹⁴ 6d³ 7s²", fact: "Đặt theo tên thành phố Dubna, Nga." },
+            { number: 106, symbol: "Sg", name: "Seaborgium", nameVi: "Seaborgi", mass: 269, category: "transition", period: 7, group: 6, electronegativity: null, state: "Rắn", year: "1974", config: "[Rn] 5f¹⁴ 6d⁴ 7s²", fact: "Đặt theo tên Glenn Seaborg khi ông còn sống." },
+            { number: 107, symbol: "Bh", name: "Bohrium", nameVi: "Bohri", mass: 270, category: "transition", period: 7, group: 7, electronegativity: null, state: "Rắn", year: "1981", config: "[Rn] 5f¹⁴ 6d⁵ 7s²", fact: "Đặt theo tên Niels Bohr, cha đẻ cơ học lượng tử." },
+            { number: 108, symbol: "Hs", name: "Hassium", nameVi: "Hassi", mass: 277, category: "transition", period: 7, group: 8, electronegativity: null, state: "Rắn", year: "1984", config: "[Rn] 5f¹⁴ 6d⁶ 7s²", fact: "Đặt theo tên tiểu bang Hesse, Đức." },
+            { number: 109, symbol: "Mt", name: "Meitnerium", nameVi: "Meitneri", mass: 278, category: "unknown", period: 7, group: 9, electronegativity: null, state: "Rắn", year: "1982", config: "[Rn] 5f¹⁴ 6d⁷ 7s²", fact: "Đặt theo tên Lise Meitner, người đồng phát hiện phân hạch." },
+            { number: 110, symbol: "Ds", name: "Darmstadtium", nameVi: "Darmstadti", mass: 281, category: "unknown", period: 7, group: 10, electronegativity: null, state: "Rắn", year: "1994", config: "[Rn] 5f¹⁴ 6d⁸ 7s²", fact: "Đặt theo tên thành phố Darmstadt, Đức." },
+            { number: 111, symbol: "Rg", name: "Roentgenium", nameVi: "Roentgeni", mass: 282, category: "unknown", period: 7, group: 11, electronegativity: null, state: "Rắn", year: "1994", config: "[Rn] 5f¹⁴ 6d⁹ 7s²", fact: "Đặt theo tên Wilhelm Röntgen, người phát hiện tia X." },
+            { number: 112, symbol: "Cn", name: "Copernicium", nameVi: "Copernici", mass: 285, category: "unknown", period: 7, group: 12, electronegativity: null, state: "Khí?", year: "1996", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s²", fact: "Đặt theo tên Nicolaus Copernicus." },
+            { number: 113, symbol: "Nh", name: "Nihonium", nameVi: "Nihoni", mass: 286, category: "unknown", period: 7, group: 13, electronegativity: null, state: "Rắn", year: "2004", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹", fact: "Nguyên tố đầu tiên được đặt tên bởi châu Á (Nhật Bản)." },
+            { number: 114, symbol: "Fl", name: "Flerovium", nameVi: "Flerovi", mass: 289, category: "unknown", period: 7, group: 14, electronegativity: null, state: "Rắn", year: "1998", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²", fact: "Đặt theo tên Georgy Flyorov, nhà vật lý Liên Xô." },
+            { number: 115, symbol: "Mc", name: "Moscovium", nameVi: "Moscovi", mass: 290, category: "unknown", period: 7, group: 15, electronegativity: null, state: "Rắn", year: "2003", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³", fact: "Đặt theo tên vùng Moscow, Nga." },
+            { number: 116, symbol: "Lv", name: "Livermorium", nameVi: "Livermori", mass: 293, category: "unknown", period: 7, group: 16, electronegativity: null, state: "Rắn", year: "2000", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴", fact: "Đặt theo tên phòng thí nghiệm Lawrence Livermore." },
+            { number: 117, symbol: "Ts", name: "Tennessine", nameVi: "Tennessi", mass: 294, category: "unknown", period: 7, group: 17, electronegativity: null, state: "Rắn", year: "2010", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵", fact: "Đặt theo tên tiểu bang Tennessee, Mỹ." },
+            { number: 118, symbol: "Og", name: "Oganesson", nameVi: "Oganesson", mass: 294, category: "unknown", period: 7, group: 18, electronegativity: null, state: "Rắn", year: "2006", config: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", fact: "Nguyên tố nặng nhất, đặt theo tên Yuri Oganessian." },
+
+            // Lanthanides (58-71)
+            { number: 58, symbol: "Ce", name: "Cerium", nameVi: "Xeri", mass: 140.1, category: "lanthanide", period: 6, group: null, electronegativity: 1.12, state: "Rắn", year: "1803", config: "[Xe] 4f¹ 5d¹ 6s²", fact: "Dùng trong kính ô tô tự làm sạch và bật lửa." },
+            { number: 59, symbol: "Pr", name: "Praseodymium", nameVi: "Praseođim", mass: 140.9, category: "lanthanide", period: 6, group: null, electronegativity: 1.13, state: "Rắn", year: "1885", config: "[Xe] 4f³ 6s²", fact: "Tạo màu xanh lá cho thủy tinh và gốm sứ." },
+            { number: 60, symbol: "Nd", name: "Neodymium", nameVi: "Neođim", mass: 144.2, category: "lanthanide", period: 6, group: null, electronegativity: 1.14, state: "Rắn", year: "1885", config: "[Xe] 4f⁴ 6s²", fact: "Dùng làm nam châm mạnh nhất thế giới." },
+            { number: 61, symbol: "Pm", name: "Promethium", nameVi: "Prometi", mass: 145, category: "lanthanide", period: 6, group: null, electronegativity: 1.13, state: "Rắn", year: "1945", config: "[Xe] 4f⁵ 6s²", fact: "Lanthanide phóng xạ duy nhất, dùng trong pin hạt nhân." },
+            { number: 62, symbol: "Sm", name: "Samarium", nameVi: "Samari", mass: 150.4, category: "lanthanide", period: 6, group: null, electronegativity: 1.17, state: "Rắn", year: "1879", config: "[Xe] 4f⁶ 6s²", fact: "Dùng trong nam châm SmCo và điều trị ung thư." },
+            { number: 63, symbol: "Eu", name: "Europium", nameVi: "Europi", mass: 152.0, category: "lanthanide", period: 6, group: null, electronegativity: 1.2, state: "Rắn", year: "1901", config: "[Xe] 4f⁷ 6s²", fact: "Dùng trong đèn huỳnh quang và tiền giấy chống giả." },
+            { number: 64, symbol: "Gd", name: "Gadolinium", nameVi: "Gađolini", mass: 157.3, category: "lanthanide", period: 6, group: null, electronegativity: 1.2, state: "Rắn", year: "1880", config: "[Xe] 4f⁷ 5d¹ 6s²", fact: "Dùng làm chất tương phản MRI trong y tế." },
+            { number: 65, symbol: "Tb", name: "Terbium", nameVi: "Terbi", mass: 158.9, category: "lanthanide", period: 6, group: null, electronegativity: 1.2, state: "Rắn", year: "1843", config: "[Xe] 4f⁹ 6s²", fact: "Dùng trong đèn huỳnh quang xanh lá và TV." },
+            { number: 66, symbol: "Dy", name: "Dysprosium", nameVi: "Đysprosi", mass: 162.5, category: "lanthanide", period: 6, group: null, electronegativity: 1.22, state: "Rắn", year: "1886", config: "[Xe] 4f¹⁰ 6s²", fact: "Dùng trong động cơ xe điện và tuabin gió." },
+            { number: 67, symbol: "Ho", name: "Holmium", nameVi: "Holmi", mass: 164.9, category: "lanthanide", period: 6, group: null, electronegativity: 1.23, state: "Rắn", year: "1878", config: "[Xe] 4f¹¹ 6s²", fact: "Có từ tính mạnh nhất trong các nguyên tố." },
+            { number: 68, symbol: "Er", name: "Erbium", nameVi: "Erbi", mass: 167.3, category: "lanthanide", period: 6, group: null, electronegativity: 1.24, state: "Rắn", year: "1843", config: "[Xe] 4f¹² 6s²", fact: "Dùng trong cáp quang và laser y tế." },
+            { number: 69, symbol: "Tm", name: "Thulium", nameVi: "Thuli", mass: 168.9, category: "lanthanide", period: 6, group: null, electronegativity: 1.25, state: "Rắn", year: "1879", config: "[Xe] 4f¹³ 6s²", fact: "Lanthanide hiếm nhất, dùng trong laser phẫu thuật." },
+            { number: 70, symbol: "Yb", name: "Ytterbium", nameVi: "Ytterbi", mass: 173.0, category: "lanthanide", period: 6, group: null, electronegativity: 1.1, state: "Rắn", year: "1878", config: "[Xe] 4f¹⁴ 6s²", fact: "Dùng trong đồng hồ nguyên tử siêu chính xác." },
+            { number: 71, symbol: "Lu", name: "Lutetium", nameVi: "Luteti", mass: 175.0, category: "lanthanide", period: 6, group: null, electronegativity: 1.27, state: "Rắn", year: "1907", config: "[Xe] 4f¹⁴ 5d¹ 6s²", fact: "Dùng trong xúc tác lọc dầu và PET scan." },
+
+            // Actinides (90-103)
+            { number: 90, symbol: "Th", name: "Thorium", nameVi: "Thori", mass: 232.0, category: "actinide", period: 7, group: null, electronegativity: 1.3, state: "Rắn", year: "1829", config: "[Rn] 6d² 7s²", fact: "Nhiên liệu hạt nhân tiềm năng, từng dùng trong vỏ đèn gas." },
+            { number: 91, symbol: "Pa", name: "Protactinium", nameVi: "Protactini", mass: 231.0, category: "actinide", period: 7, group: null, electronegativity: 1.5, state: "Rắn", year: "1913", config: "[Rn] 5f² 6d¹ 7s²", fact: "Một trong những nguyên tố hiếm nhất và đắt nhất." },
+            { number: 92, symbol: "U", name: "Uranium", nameVi: "Urani", mass: 238.0, category: "actinide", period: 7, group: null, electronegativity: 1.38, state: "Rắn", year: "1789", config: "[Rn] 5f³ 6d¹ 7s²", fact: "Nhiên liệu nhà máy điện hạt nhân và vũ khí nguyên tử." },
+            { number: 93, symbol: "Np", name: "Neptunium", nameVi: "Neptuni", mass: 237, category: "actinide", period: 7, group: null, electronegativity: 1.36, state: "Rắn", year: "1940", config: "[Rn] 5f⁴ 6d¹ 7s²", fact: "Nguyên tố siêu urani đầu tiên được tổng hợp." },
+            { number: 94, symbol: "Pu", name: "Plutonium", nameVi: "Plutoni", mass: 244, category: "actinide", period: 7, group: null, electronegativity: 1.28, state: "Rắn", year: "1940", config: "[Rn] 5f⁶ 7s²", fact: "Dùng trong vũ khí hạt nhân và nguồn điện tàu vũ trụ." },
+            { number: 95, symbol: "Am", name: "Americium", nameVi: "Americi", mass: 243, category: "actinide", period: 7, group: null, electronegativity: 1.13, state: "Rắn", year: "1944", config: "[Rn] 5f⁷ 7s²", fact: "Dùng trong đầu dò khói gia đình." },
+            { number: 96, symbol: "Cm", name: "Curium", nameVi: "Curi", mass: 247, category: "actinide", period: 7, group: null, electronegativity: 1.28, state: "Rắn", year: "1944", config: "[Rn] 5f⁷ 6d¹ 7s²", fact: "Đ���t theo tên vợ chồng Pierre và Marie Curie." },
+            { number: 97, symbol: "Bk", name: "Berkelium", nameVi: "Berkeli", mass: 247, category: "actinide", period: 7, group: null, electronegativity: 1.3, state: "Rắn", year: "1949", config: "[Rn] 5f⁹ 7s²", fact: "Đặt theo tên thành phố Berkeley, California." },
+            { number: 98, symbol: "Cf", name: "Californium", nameVi: "Californi", mass: 251, category: "actinide", period: 7, group: null, electronegativity: 1.3, state: "Rắn", year: "1950", config: "[Rn] 5f¹⁰ 7s²", fact: "Một gram có giá 27 triệu USD, dùng trong y tế và khai mỏ." },
+            { number: 99, symbol: "Es", name: "Einsteinium", nameVi: "Einsteini", mass: 252, category: "actinide", period: 7, group: null, electronegativity: 1.3, state: "Rắn", year: "1952", config: "[Rn] 5f¹¹ 7s²", fact: "Được phát hiện trong bụi phóng xạ của bom H đầu tiên." },
+            { number: 100, symbol: "Fm", name: "Fermium", nameVi: "Fermi", mass: 257, category: "actinide", period: 7, group: null, electronegativity: 1.3, state: "Rắn", year: "1952", config: "[Rn] 5f¹² 7s²", fact: "Đặt theo tên Enrico Fermi, cha đẻ lò phản ứng hạt nhân." },
+            { number: 101, symbol: "Md", name: "Mendelevium", nameVi: "Menđelevi", mass: 258, category: "actinide", period: 7, group: null, electronegativity: 1.3, state: "Rắn", year: "1955", config: "[Rn] 5f¹³ 7s²", fact: "Đặt theo tên Dmitri Mendeleev, cha đẻ bảng tuần hoàn." },
+            { number: 102, symbol: "No", name: "Nobelium", nameVi: "Nobeli", mass: 259, category: "actinide", period: 7, group: null, electronegativity: 1.3, state: "Rắn", year: "1958", config: "[Rn] 5f¹⁴ 7s²", fact: "Đặt theo tên Alfred Nobel, người sáng lập giải Nobel." },
+            { number: 103, symbol: "Lr", name: "Lawrencium", nameVi: "Lawrenci", mass: 266, category: "actinide", period: 7, group: null, electronegativity: 1.3, state: "Rắn", year: "1961", config: "[Rn] 5f¹⁴ 7s² 7p¹", fact: "Actinide cuối cùng, đặt theo tên Ernest Lawrence." }
+        ];
+
+        // Grid position mapping
+        const gridPositions = [
+            // Period 1
+            { number: 1, row: 1, col: 1 },
+            { number: 2, row: 1, col: 18 },
+            // Period 2
+            { number: 3, row: 2, col: 1 },
+            { number: 4, row: 2, col: 2 },
+            { number: 5, row: 2, col: 13 },
+            { number: 6, row: 2, col: 14 },
+            { number: 7, row: 2, col: 15 },
+            { number: 8, row: 2, col: 16 },
+            { number: 9, row: 2, col: 17 },
+            { number: 10, row: 2, col: 18 },
+            // Period 3
+            { number: 11, row: 3, col: 1 },
+            { number: 12, row: 3, col: 2 },
+            { number: 13, row: 3, col: 13 },
+            { number: 14, row: 3, col: 14 },
+            { number: 15, row: 3, col: 15 },
+            { number: 16, row: 3, col: 16 },
+            { number: 17, row: 3, col: 17 },
+            { number: 18, row: 3, col: 18 },
+            // Period 4
+            { number: 19, row: 4, col: 1 },
+            { number: 20, row: 4, col: 2 },
+            { number: 21, row: 4, col: 3 },
+            { number: 22, row: 4, col: 4 },
+            { number: 23, row: 4, col: 5 },
+            { number: 24, row: 4, col: 6 },
+            { number: 25, row: 4, col: 7 },
+            { number: 26, row: 4, col: 8 },
+            { number: 27, row: 4, col: 9 },
+            { number: 28, row: 4, col: 10 },
+            { number: 29, row: 4, col: 11 },
+            { number: 30, row: 4, col: 12 },
+            { number: 31, row: 4, col: 13 },
+            { number: 32, row: 4, col: 14 },
+            { number: 33, row: 4, col: 15 },
+            { number: 34, row: 4, col: 16 },
+            { number: 35, row: 4, col: 17 },
+            { number: 36, row: 4, col: 18 },
+            // Period 5
+            { number: 37, row: 5, col: 1 },
+            { number: 38, row: 5, col: 2 },
+            { number: 39, row: 5, col: 3 },
+            { number: 40, row: 5, col: 4 },
+            { number: 41, row: 5, col: 5 },
+            { number: 42, row: 5, col: 6 },
+            { number: 43, row: 5, col: 7 },
+            { number: 44, row: 5, col: 8 },
+            { number: 45, row: 5, col: 9 },
+            { number: 46, row: 5, col: 10 },
+            { number: 47, row: 5, col: 11 },
+            { number: 48, row: 5, col: 12 },
+            { number: 49, row: 5, col: 13 },
+            { number: 50, row: 5, col: 14 },
+            { number: 51, row: 5, col: 15 },
+            { number: 52, row: 5, col: 16 },
+            { number: 53, row: 5, col: 17 },
+            { number: 54, row: 5, col: 18 },
+            // Period 6
+            { number: 55, row: 6, col: 1 },
+            { number: 56, row: 6, col: 2 },
+            { number: 57, row: 6, col: 3 }, // La placeholder
+            { number: 72, row: 6, col: 4 },
+            { number: 73, row: 6, col: 5 },
+            { number: 74, row: 6, col: 6 },
+            { number: 75, row: 6, col: 7 },
+            { number: 76, row: 6, col: 8 },
+            { number: 77, row: 6, col: 9 },
+            { number: 78, row: 6, col: 10 },
+            { number: 79, row: 6, col: 11 },
+            { number: 80, row: 6, col: 12 },
+            { number: 81, row: 6, col: 13 },
+            { number: 82, row: 6, col: 14 },
+            { number: 83, row: 6, col: 15 },
+            { number: 84, row: 6, col: 16 },
+            { number: 85, row: 6, col: 17 },
+            { number: 86, row: 6, col: 18 },
+            // Period 7
+            { number: 87, row: 7, col: 1 },
+            { number: 88, row: 7, col: 2 },
+            { number: 89, row: 7, col: 3 }, // Ac placeholder
+            { number: 104, row: 7, col: 4 },
+            { number: 105, row: 7, col: 5 },
+            { number: 106, row: 7, col: 6 },
+            { number: 107, row: 7, col: 7 },
+            { number: 108, row: 7, col: 8 },
+            { number: 109, row: 7, col: 9 },
+            { number: 110, row: 7, col: 10 },
+            { number: 111, row: 7, col: 11 },
+            { number: 112, row: 7, col: 12 },
+            { number: 113, row: 7, col: 13 },
+            { number: 114, row: 7, col: 14 },
+            { number: 115, row: 7, col: 15 },
+            { number: 116, row: 7, col: 16 },
+            { number: 117, row: 7, col: 17 },
+            { number: 118, row: 7, col: 18 },
+            // Lanthanides (row 9)
+            { number: 58, row: 9, col: 4 },
+            { number: 59, row: 9, col: 5 },
+            { number: 60, row: 9, col: 6 },
+            { number: 61, row: 9, col: 7 },
+            { number: 62, row: 9, col: 8 },
+            { number: 63, row: 9, col: 9 },
+            { number: 64, row: 9, col: 10 },
+            { number: 65, row: 9, col: 11 },
+            { number: 66, row: 9, col: 12 },
+            { number: 67, row: 9, col: 13 },
+            { number: 68, row: 9, col: 14 },
+            { number: 69, row: 9, col: 15 },
+            { number: 70, row: 9, col: 16 },
+            { number: 71, row: 9, col: 17 },
+            // Actinides (row 10)
+            { number: 90, row: 10, col: 4 },
+            { number: 91, row: 10, col: 5 },
+            { number: 92, row: 10, col: 6 },
+            { number: 93, row: 10, col: 7 },
+            { number: 94, row: 10, col: 8 },
+            { number: 95, row: 10, col: 9 },
+            { number: 96, row: 10, col: 10 },
+            { number: 97, row: 10, col: 11 },
+            { number: 98, row: 10, col: 12 },
+            { number: 99, row: 10, col: 13 },
+            { number: 100, row: 10, col: 14 },
+            { number: 101, row: 10, col: 15 },
+            { number: 102, row: 10, col: 16 },
+            { number: 103, row: 10, col: 17 }
+        ];
+
+        // Category names in Vietnamese
+        const categoryNames = {
+            'alkali': 'Kim loại kiềm',
+            'alkaline': 'Kim loại kiềm thổ',
+            'transition': 'Kim loại chuyển tiếp',
+            'post-transition': 'Kim loại yếu',
+            'metalloid': 'Á kim',
+            'nonmetal': 'Phi kim',
+            'halogen': 'Halogen',
+            'noble': 'Khí hiếm',
+            'lanthanide': 'Lantanit',
+            'actinide': 'Actinit',
+            'unknown': 'Chưa xác định'
+        };
+
+        // IPA Pronunciations for all elements
+        const elementPronunciations = {
+            "Hydrogen": { ipa: "/ˈhaɪdrədʒən/", speak: "Hydrogen" },
+            "Helium": { ipa: "/ˈhiːliəm/", speak: "Helium" },
+            "Lithium": { ipa: "/ˈlɪθiəm/", speak: "Lithium" },
+            "Beryllium": { ipa: "/bəˈrɪliəm/", speak: "Beryllium" },
+            "Boron": { ipa: "/ˈbɔːrɒn/", speak: "Boron" },
+            "Carbon": { ipa: "/ˈkɑːbən/", speak: "Carbon" },
+            "Nitrogen": { ipa: "/ˈnaɪtrədʒən/", speak: "Nitrogen" },
+            "Oxygen": { ipa: "/ˈɒksɪdʒən/", speak: "Oxygen" },
+            "Fluorine": { ipa: "/ˈflʊəriːn/", speak: "Fluorine" },
+            "Neon": { ipa: "/ˈniːɒn/", speak: "Neon" },
+            "Sodium": { ipa: "/ˈsəʊdiəm/", speak: "Sodium" },
+            "Magnesium": { ipa: "/mæɡˈniːziəm/", speak: "Magnesium" },
+            "Aluminium": { ipa: "/ˌæljʊˈmɪniəm/", speak: "Aluminium" },
+            "Silicon": { ipa: "/ˈsɪlɪkən/", speak: "Silicon" },
+            "Phosphorus": { ipa: "/ˈfɒsfərəs/", speak: "Phosphorus" },
+            "Sulfur": { ipa: "/ˈsʌlfər/", speak: "Sulfur" },
+            "Chlorine": { ipa: "/ˈklɔːriːn/", speak: "Chlorine" },
+            "Argon": { ipa: "/ˈɑːɡɒn/", speak: "Argon" },
+            "Potassium": { ipa: "/pəˈtæsiəm/", speak: "Potassium" },
+            "Calcium": { ipa: "/ˈkælsiəm/", speak: "Calcium" },
+            "Scandium": { ipa: "/ˈskændiəm/", speak: "Scandium" },
+            "Titanium": { ipa: "/taɪˈteɪniəm/", speak: "Titanium" },
+            "Vanadium": { ipa: "/vəˈneɪdiəm/", speak: "Vanadium" },
+            "Chromium": { ipa: "/ˈkrəʊmiəm/", speak: "Chromium" },
+            "Manganese": { ipa: "/ˈmæŋɡəniːz/", speak: "Manganese" },
+            "Iron": { ipa: "/ˈaɪən/", speak: "Iron" },
+            "Cobalt": { ipa: "/ˈkəʊbɔːlt/", speak: "Cobalt" },
+            "Nickel": { ipa: "/ˈnɪkəl/", speak: "Nickel" },
+            "Copper": { ipa: "/ˈkɒpər/", speak: "Copper" },
+            "Zinc": { ipa: "/zɪŋk/", speak: "Zinc" },
+            "Gallium": { ipa: "/ˈɡæliəm/", speak: "Gallium" },
+            "Germanium": { ipa: "/dʒɜːˈmeɪniəm/", speak: "Germanium" },
+            "Arsenic": { ipa: "/ˈɑːsnɪk/", speak: "Arsenic" },
+            "Selenium": { ipa: "/sɪˈliːniəm/", speak: "Selenium" },
+            "Bromine": { ipa: "/ˈbrəʊmiːn/", speak: "Bromine" },
+            "Krypton": { ipa: "/ˈkrɪptɒn/", speak: "Krypton" },
+            "Rubidium": { ipa: "/ruːˈbɪdiəm/", speak: "Rubidium" },
+            "Strontium": { ipa: "/ˈstrɒntiəm/", speak: "Strontium" },
+            "Yttrium": { ipa: "/ˈɪtriəm/", speak: "Yttrium" },
+            "Zirconium": { ipa: "/zɜːˈkəʊniəm/", speak: "Zirconium" },
+            "Niobium": { ipa: "/naɪˈəʊbiəm/", speak: "Niobium" },
+            "Molybdenum": { ipa: "/məˈlɪbdənəm/", speak: "Molybdenum" },
+            "Technetium": { ipa: "/tekˈniːʃiəm/", speak: "Technetium" },
+            "Ruthenium": { ipa: "/ruːˈθiːniəm/", speak: "Ruthenium" },
+            "Rhodium": { ipa: "/ˈrəʊdiəm/", speak: "Rhodium" },
+            "Palladium": { ipa: "/pəˈleɪdiəm/", speak: "Palladium" },
+            "Silver": { ipa: "/ˈsɪlvər/", speak: "Silver" },
+            "Cadmium": { ipa: "/ˈkædmiəm/", speak: "Cadmium" },
+            "Indium": { ipa: "/ˈɪndiəm/", speak: "Indium" },
+            "Tin": { ipa: "/tɪn/", speak: "Tin" },
+            "Antimony": { ipa: "/ˈæntɪməni/", speak: "Antimony" },
+            "Tellurium": { ipa: "/tɪˈljʊəriəm/", speak: "Tellurium" },
+            "Iodine": { ipa: "/ˈaɪədiːn/", speak: "Iodine" },
+            "Xenon": { ipa: "/ˈziːnɒn/", speak: "Xenon" },
+            "Cesium": { ipa: "/ˈsiːziəm/", speak: "Cesium" },
+            "Barium": { ipa: "/ˈbeəriəm/", speak: "Barium" },
+            "Lanthanum": { ipa: "/ˈlænθənəm/", speak: "Lanthanum" },
+            "Cerium": { ipa: "/ˈsɪəriəm/", speak: "Cerium" },
+            "Praseodymium": { ipa: "/ˌpreɪziəʊˈdɪmiəm/", speak: "Praseodymium" },
+            "Neodymium": { ipa: "/ˌni��əʊˈdɪmiəm/", speak: "Neodymium" },
+            "Promethium": { ipa: "/prəˈmiːθiəm/", speak: "Promethium" },
+            "Samarium": { ipa: "/səˈmeəriəm/", speak: "Samarium" },
+            "Europium": { ipa: "/jʊˈrəʊpiəm/", speak: "Europium" },
+            "Gadolinium": { ipa: "/ˌɡædəˈlɪniəm/", speak: "Gadolinium" },
+            "Terbium": { ipa: "/ˈtɜːbiəm/", speak: "Terbium" },
+            "Dysprosium": { ipa: "/dɪsˈprəʊziəm/", speak: "Dysprosium" },
+            "Holmium": { ipa: "/ˈhəʊlmiəm/", speak: "Holmium" },
+            "Erbium": { ipa: "/ˈɜːbiəm/", speak: "Erbium" },
+            "Thulium": { ipa: "/ˈθjuːliəm/", speak: "Thulium" },
+            "Ytterbium": { ipa: "/ɪˈtɜːbiəm/", speak: "Ytterbium" },
+            "Lutetium": { ipa: "/luːˈtiːʃiəm/", speak: "Lutetium" },
+            "Hafnium": { ipa: "/ˈhæfniəm/", speak: "Hafnium" },
+            "Tantalum": { ipa: "/ˈtæntələm/", speak: "Tantalum" },
+            "Tungsten": { ipa: "/ˈtʌŋstən/", speak: "Tungsten" },
+            "Rhenium": { ipa: "/ˈriːniəm/", speak: "Rhenium" },
+            "Osmium": { ipa: "/ˈɒzmiəm/", speak: "Osmium" },
+            "Iridium": { ipa: "/ɪˈrɪdiəm/", speak: "Iridium" },
+            "Platinum": { ipa: "/ˈplætɪnəm/", speak: "Platinum" },
+            "Gold": { ipa: "/ɡəʊld/", speak: "Gold" },
+            "Mercury": { ipa: "/ˈmɜːkjʊri/", speak: "Mercury" },
+            "Thallium": { ipa: "/ˈθæliəm/", speak: "Thallium" },
+            "Lead": { ipa: "/led/", speak: "Lead" },
+            "Bismuth": { ipa: "/ˈbɪzməθ/", speak: "Bismuth" },
+            "Polonium": { ipa: "/pəˈləʊniəm/", speak: "Polonium" },
+            "Astatine": { ipa: "/ˈæstətiːn/", speak: "Astatine" },
+            "Radon": { ipa: "/ˈreɪdɒn/", speak: "Radon" },
+            "Francium": { ipa: "/ˈfrænsiəm/", speak: "Francium" },
+            "Radium": { ipa: "/ˈreɪdiəm/", speak: "Radium" },
+            "Actinium": { ipa: "/ækˈtɪniəm/", speak: "Actinium" },
+            "Thorium": { ipa: "/ˈθɔːriəm/", speak: "Thorium" },
+            "Protactinium": { ipa: "/ˌprəʊtækˈtɪniəm/", speak: "Protactinium" },
+            "Uranium": { ipa: "/jʊˈreɪniəm/", speak: "Uranium" },
+            "Neptunium": { ipa: "/nepˈtjuːniəm/", speak: "Neptunium" },
+            "Plutonium": { ipa: "/pluːˈtəʊniəm/", speak: "Plutonium" },
+            "Americium": { ipa: "/ˌæməˈrɪsiəm/", speak: "Americium" },
+            "Curium": { ipa: "/ˈkjʊəriəm/", speak: "Curium" },
+            "Berkelium": { ipa: "/bɜːˈkiːliəm/", speak: "Berkelium" },
+            "Californium": { ipa: "/ˌkælɪˈfɔːniəm/", speak: "Californium" },
+            "Einsteinium": { ipa: "/aɪnˈstaɪniəm/", speak: "Einsteinium" },
+            "Fermium": { ipa: "/ˈfɜːmiəm/", speak: "Fermium" },
+            "Mendelevium": { ipa: "/ˌmendəˈliːviəm/", speak: "Mendelevium" },
+            "Nobelium": { ipa: "/nəʊˈbiːliəm/", speak: "Nobelium" },
+            "Lawrencium": { ipa: "/lɔːˈrensiəm/", speak: "Lawrencium" },
+            "Rutherfordium": { ipa: "/ˌrʌðəˈfɔːdiəm/", speak: "Rutherfordium" },
+            "Dubnium": { ipa: "/ˈdʌbniəm/", speak: "Dubnium" },
+            "Seaborgium": { ipa: "/siːˈbɔːɡiəm/", speak: "Seaborgium" },
+            "Bohrium": { ipa: "/ˈbɔːriəm/", speak: "Bohrium" },
+            "Hassium": { ipa: "/ˈhæsiəm/", speak: "Hassium" },
+            "Meitnerium": { ipa: "/maɪtˈnɪəriəm/", speak: "Meitnerium" },
+            "Darmstadtium": { ipa: "/dɑːmˈʃtætiəm/", speak: "Darmstadtium" },
+            "Roentgenium": { ipa: "/rɒntˈɡiːniəm/", speak: "Roentgenium" },
+            "Copernicium": { ipa: "/ˌkəʊpərˈnɪsiəm/", speak: "Copernicium" },
+            "Nihonium": { ipa: "/nɪˈhəʊniəm/", speak: "Nihonium" },
+            "Flerovium": { ipa: "/flɪˈrɒviəm/", speak: "Flerovium" },
+            "Moscovium": { ipa: "/mɒsˈkəʊviəm/", speak: "Moscovium" },
+            "Livermorium": { ipa: "/ˌlɪvərˈmɔːriəm/", speak: "Livermorium" },
+            "Tennessine": { ipa: "/ˈtenəsiːn/", speak: "Tennessine" },
+            "Oganesson": { ipa: "/ˌɒɡəˈnesɒn/", speak: "Oganesson" },
+            // Vietnamese names mapping to English for pronunciation
+            "Hydro": { ipa: "/ˈhaɪdrədʒən/", speak: "Hydrogen" },
+            "Heli": { ipa: "/ˈhiːliəm/", speak: "Helium" },
+            "Liti": { ipa: "/ˈlɪθiəm/", speak: "Lithium" },
+            "Berili": { ipa: "/bəˈrɪliəm/", speak: "Beryllium" },
+            "Bo": { ipa: "/ˈbɔːrɒn/", speak: "Boron" },
+            "Cacbon": { ipa: "/ˈkɑːbən/", speak: "Carbon" },
+            "Nitơ": { ipa: "/ˈnaɪtrədʒən/", speak: "Nitrogen" },
+            "Oxi": { ipa: "/ˈɒksɪdʒən/", speak: "Oxygen" },
+            "Flo": { ipa: "/ˈflʊəriːn/", speak: "Fluorine" },
+            "Natri": { ipa: "/ˈsəʊdiəm/", speak: "Sodium" },
+            "Magiê": { ipa: "/mæɡˈniːziəm/", speak: "Magnesium" },
+            "Nhôm": { ipa: "/ˌæljʊˈmɪniəm/", speak: "Aluminium" },
+            "Silic": { ipa: "/ˈsɪlɪkən/", speak: "Silicon" },
+            "Photpho": { ipa: "/ˈfɒsfərəs/", speak: "Phosphorus" },
+            "Lưu huỳnh": { ipa: "/ˈsʌlfər/", speak: "Sulfur" },
+            "Clo": { ipa: "/ˈklɔːriːn/", speak: "Chlorine" },
+            "Kali": { ipa: "/pəˈtæsiəm/", speak: "Potassium" },
+            "Canxi": { ipa: "/ˈkælsiəm/", speak: "Calcium" },
+            "Scandi": { ipa: "/ˈskændiəm/", speak: "Scandium" },
+            "Titan": { ipa: "/taɪˈteɪniəm/", speak: "Titanium" },
+            "Vanadi": { ipa: "/vəˈneɪdiəm/", speak: "Vanadium" },
+            "Crom": { ipa: "/ˈkrəʊmiəm/", speak: "Chromium" },
+            "Mangan": { ipa: "/ˈmæŋɡəniːz/", speak: "Manganese" },
+            "Sắt": { ipa: "/ˈaɪən/", speak: "Iron" },
+            "Coban": { ipa: "/ˈkəʊbɔːlt/", speak: "Cobalt" },
+            "Niken": { ipa: "/ˈnɪkəl/", speak: "Nickel" },
+            "Đồng": { ipa: "/ˈkɒpər/", speak: "Copper" },
+            "Kẽm": { ipa: "/zɪŋk/", speak: "Zinc" },
+            "Gali": { ipa: "/ˈɡæliəm/", speak: "Gallium" },
+            "Gecmani": { ipa: "/dʒɜːˈmeɪniəm/", speak: "Germanium" },
+            "Asen": { ipa: "/ˈɑːsnɪk/", speak: "Arsenic" },
+            "Selen": { ipa: "/sɪˈliːniəm/", speak: "Selenium" },
+            "Brom": { ipa: "/ˈbrəʊmiːn/", speak: "Bromine" },
+            "Kripton": { ipa: "/ˈkrɪptɒn/", speak: "Krypton" },
+            "Rubidi": { ipa: "/ruːˈbɪdiəm/", speak: "Rubidium" },
+            "Stronti": { ipa: "/ˈstrɒntiəm/", speak: "Strontium" },
+            "Ytri": { ipa: "/ˈɪtriəm/", speak: "Yttrium" },
+            "Zirconi": { ipa: "/zɜːˈkəʊniəm/", speak: "Zirconium" },
+            "Niobi": { ipa: "/naɪˈəʊbiəm/", speak: "Niobium" },
+            "Molypđen": { ipa: "/məˈlɪbdənəm/", speak: "Molybdenum" },
+            "Tecneti": { ipa: "/tekˈniːʃiəm/", speak: "Technetium" },
+            "Ruteni": { ipa: "/ruːˈθiːniəm/", speak: "Ruthenium" },
+            "Rođi": { ipa: "/ˈrəʊdiəm/", speak: "Rhodium" },
+            "Palađi": { ipa: "/pəˈleɪdiəm/", speak: "Palladium" },
+            "Bạc": { ipa: "/ˈsɪlvər/", speak: "Silver" },
+            "Cađimi": { ipa: "/ˈkædmiəm/", speak: "Cadmium" },
+            "Inđi": { ipa: "/ˈɪndiəm/", speak: "Indium" },
+            "Thiếc": { ipa: "/tɪn/", speak: "Tin" },
+            "Antimon": { ipa: "/ˈæntɪməni/", speak: "Antimony" },
+            "Telu": { ipa: "/tɪˈljʊəriəm/", speak: "Tellurium" },
+            "Iot": { ipa: "/ˈaɪədiːn/", speak: "Iodine" },
+            "Xesi": { ipa: "/ˈsiːziəm/", speak: "Cesium" },
+            "Bari": { ipa: "/ˈbeəriəm/", speak: "Barium" },
+            "Lantan": { ipa: "/ˈlænθənəm/", speak: "Lanthanum" },
+            "Xeri": { ipa: "/ˈsɪəriəm/", speak: "Cerium" },
+            "Praseođim": { ipa: "/ˌpreɪziəʊˈdɪmiəm/", speak: "Praseodymium" },
+            "Neođim": { ipa: "/ˌniːəʊˈdɪmiəm/", speak: "Neodymium" },
+            "Prometi": { ipa: "/prəˈmiːθiəm/", speak: "Promethium" },
+            "Samari": { ipa: "/səˈmeəriəm/", speak: "Samarium" },
+            "Europi": { ipa: "/jʊˈrəʊpiəm/", speak: "Europium" },
+            "Gađolini": { ipa: "/ˌɡædəˈlɪniəm/", speak: "Gadolinium" },
+            "Terbi": { ipa: "/ˈtɜːbiəm/", speak: "Terbium" },
+            "Đysprosi": { ipa: "/dɪsˈprəʊziəm/", speak: "Dysprosium" },
+            "Holmi": { ipa: "/ˈhəʊlmiəm/", speak: "Holmium" },
+            "Erbi": { ipa: "/ˈɜːbiəm/", speak: "Erbium" },
+            "Thuli": { ipa: "/ˈθjuːliəm/", speak: "Thulium" },
+            "Ytterbi": { ipa: "/ɪˈtɜːbiəm/", speak: "Ytterbium" },
+            "Luteti": { ipa: "/luːˈtiːʃiəm/", speak: "Lutetium" },
+            "Hafni": { ipa: "/ˈhæfniəm/", speak: "Hafnium" },
+            "Tantan": { ipa: "/ˈtæntələm/", speak: "Tantalum" },
+            "Vonfram": { ipa: "/ˈtʌŋstən/", speak: "Tungsten" },
+            "Reni": { ipa: "/ˈriːniəm/", speak: "Rhenium" },
+            "Osmi": { ipa: "/ˈɒzmiəm/", speak: "Osmium" },
+            "Iriđi": { ipa: "/ɪˈrɪdiəm/", speak: "Iridium" },
+            "Platin": { ipa: "/ˈplætɪnəm/", speak: "Platinum" },
+            "Vàng": { ipa: "/ɡəʊld/", speak: "Gold" },
+            "Thủy ngân": { ipa: "/ˈmɜːkjʊri/", speak: "Mercury" },
+            "Tali": { ipa: "/ˈθæliəm/", speak: "Thallium" },
+            "Chì": { ipa: "/led/", speak: "Lead" },
+            "Bitmut": { ipa: "/ˈbɪzməθ/", speak: "Bismuth" },
+            "Poloni": { ipa: "/pəˈləʊniəm/", speak: "Polonium" },
+            "Atatin": { ipa: "/ˈæstətiːn/", speak: "Astatine" },
+            "Rađon": { ipa: "/ˈreɪdɒn/", speak: "Radon" },
+            "Franxi": { ipa: "/ˈfrænsiəm/", speak: "Francium" },
+            "Rađi": { ipa: "/ˈreɪdiəm/", speak: "Radium" },
+            "Actini": { ipa: "/ækˈtɪniəm/", speak: "Actinium" },
+            "Thori": { ipa: "/ˈθɔːriəm/", speak: "Thorium" },
+            "Protactini": { ipa: "/ˌprəʊtækˈtɪniəm/", speak: "Protactinium" },
+            "Urani": { ipa: "/jʊˈreɪniəm/", speak: "Uranium" },
+            "Neptuni": { ipa: "/nepˈtjuːniəm/", speak: "Neptunium" },
+            "Plutoni": { ipa: "/pluːˈtəʊniəm/", speak: "Plutonium" },
+            "Americi": { ipa: "/ˌæməˈrɪsiəm/", speak: "Americium" },
+            "Curi": { ipa: "/ˈkjʊəriəm/", speak: "Curium" },
+            "Berkeli": { ipa: "/bɜːˈkiːliəm/", speak: "Berkelium" },
+            "Californi": { ipa: "/ˌkælɪˈfɔːniəm/", speak: "Californium" },
+            "Einsteini": { ipa: "/aɪnˈstaɪniəm/", speak: "Einsteinium" },
+            "Fermi": { ipa: "/ˈfɜːmiəm/", speak: "Fermium" },
+            "Menđelevi": { ipa: "/ˌmendəˈliːviəm/", speak: "Mendelevium" },
+            "Nobeli": { ipa: "/nəʊˈbiːliəm/", speak: "Nobelium" },
+            "Lawrenci": { ipa: "/lɔːˈrensi��m/", speak: "Lawrencium" },
+            "Rutherforđi": { ipa: "/ˌrʌðəˈfɔːdiəm/", speak: "Rutherfordium" },
+            "Dubni": { ipa: "/ˈdʌbniəm/", speak: "Dubnium" },
+            "Seaborgi": { ipa: "/siːˈbɔːɡiəm/", speak: "Seaborgium" },
+            "Bohri": { ipa: "/ˈbɔːriəm/", speak: "Bohrium" },
+            "Hassi": { ipa: "/ˈhæsiəm/", speak: "Hassium" },
+            "Meitneri": { ipa: "/maɪtˈnɪəriəm/", speak: "Meitnerium" },
+            "Darmstadti": { ipa: "/dɑːmˈʃtætiəm/", speak: "Darmstadtium" },
+            "Roentgeni": { ipa: "/rɒntˈɡiːniəm/", speak: "Roentgenium" },
+            "Copernici": { ipa: "/ˌkəʊpərˈnɪsiəm/", speak: "Copernicium" },
+            "Nihoni": { ipa: "/nɪˈhəʊniəm/", speak: "Nihonium" },
+            "Flerovi": { ipa: "/flɪˈrɒviəm/", speak: "Flerovium" },
+            "Moscovi": { ipa: "/mɒsˈkəʊviəm/", speak: "Moscovium" },
+            "Livermori": { ipa: "/ˌlɪvərˈmɔːriəm/", speak: "Livermorium" },
+            "Tennessi": { ipa: "/ˈtenəsiːn/", speak: "Tennessine" }
+        };
+
+        // Speech synthesis function
+        let currentSpeech = null;
+        function speakElement(elementName) {
+            // Cancel any ongoing speech
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+
+            const pronunciation = elementPronunciations[elementName];
+            const textToSpeak = pronunciation ? pronunciation.speak : elementName;
+
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85;
+            utterance.pitch = 1;
+
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                speakBtn.classList.add('speaking');
+                utterance.onend = () => speakBtn.classList.remove('speaking');
+                utterance.onerror = () => speakBtn.classList.remove('speaking');
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // DOM elements
+        const periodicTable = document.getElementById('periodicTable');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalClose = document.getElementById('modalClose');
+        const searchInput = document.getElementById('searchInput');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const legendItems = document.querySelectorAll('.legend-item');
+        const loading = document.getElementById('loading');
+        const particles = document.getElementById('particles');
+
+        // Create particles
+        function createParticles() {
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                const colors = ['#00f5ff', '#b829ff', '#ff29a8'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particles.appendChild(particle);
+            }
+        }
+
+        // Build periodic table
+        function buildPeriodicTable() {
+            // Create grid with 11 rows (1 for group headers + 10 for elements)
+            periodicTable.style.gridTemplateRows = '30px repeat(10, minmax(45px, 1fr))';
+
+            // Group labels mapping (column number to group notation)
+            // Columns 8-10 share group VIIIB, so we'll span it across 3 columns
+            const groupLabels = {
+                1: 'IA', 2: 'IIA', 3: 'IIIB', 4: 'IVB', 5: 'VB', 6: 'VIB', 7: 'VIIB',
+                8: 'VIIIB', // This will span columns 8-10
+                11: 'IB', 12: 'IIB',
+                13: 'IIIA', 14: 'IVA', 15: 'VA', 16: 'VIA', 17: 'VIIA', 18: 'VIIIA'
+            };
+
+            // Add empty corner cell (top-left)
+            const cornerCell = document.createElement('div');
+            cornerCell.className = 'empty';
+            cornerCell.style.gridRow = 1;
+            cornerCell.style.gridColumn = 1;
+            periodicTable.appendChild(cornerCell);
+
+            // Add group labels (row 1, columns 2-19)
+            for (let col = 1; col <= 18; col++) {
+                // Skip columns 9 and 10 since VIIIB spans from column 8
+                if (col === 9 || col === 10) continue;
+
+                const groupLabel = document.createElement('div');
+                groupLabel.className = 'group-label';
+                groupLabel.textContent = groupLabels[col];
+                groupLabel.style.gridRow = 1;
+
+                if (col === 8) {
+                    // VIIIB spans 3 columns (8, 9, 10)
+                    groupLabel.style.gridColumn = '9 / 12';
+                } else {
+                    groupLabel.style.gridColumn = col + 1;
+                }
+                periodicTable.appendChild(groupLabel);
+            }
+
+            // Period labels for each row (only rows 1-7 have period labels)
+            const periodForRow = {
+                1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7'
+            };
+
+            // Add period labels and elements
+            for (let row = 1; row <= 10; row++) {
+                // Add period label only for rows 1-7 (column 1)
+                if (periodForRow[row]) {
+                    const periodLabel = document.createElement('div');
+                    periodLabel.className = 'period-label';
+                    periodLabel.textContent = periodForRow[row];
+                    periodLabel.style.gridRow = row + 1;
+                    periodLabel.style.gridColumn = 1;
+                    periodicTable.appendChild(periodLabel);
+                }
+
+                // Add element cells (columns 2-19)
+                for (let col = 1; col <= 18; col++) {
+                    const position = gridPositions.find(p => p.row === row && p.col === col);
+
+                    if (position) {
+                        const element = elements.find(e => e.number === position.number);
+                        if (element) {
+                            const el = createElementCard(element);
+                            el.style.gridRow = row + 1;
+                            el.style.gridColumn = col + 1;
+                            periodicTable.appendChild(el);
+                        }
+                    } else {
+                        // Empty cell
+                        const empty = document.createElement('div');
+                        empty.className = 'empty';
+                        empty.style.gridRow = row + 1;
+                        empty.style.gridColumn = col + 1;
+                        periodicTable.appendChild(empty);
+                    }
+                }
+            }
+
+            // Add series labels
+            const lantLabel = document.createElement('div');
+            lantLabel.className = 'series-label';
+            lantLabel.textContent = 'Lantanit';
+            lantLabel.style.gridRow = 10;
+            lantLabel.style.gridColumn = '2 / 5';
+            periodicTable.appendChild(lantLabel);
+
+            const actLabel = document.createElement('div');
+            actLabel.className = 'series-label';
+            actLabel.textContent = 'Actinit';
+            actLabel.style.gridRow = 11;
+            actLabel.style.gridColumn = '2 / 5';
+            periodicTable.appendChild(actLabel);
+        }
+
+        // Create element card
+        function createElementCard(element) {
+            const card = document.createElement('div');
+            card.className = `element ${element.category}`;
+            card.dataset.number = element.number;
+            card.innerHTML = `
+                <span class="number">${element.number}</span>
+                <span class="symbol">${element.symbol}</span>
+                <span class="name">${element.name}</span>
+                <span class="mass">${element.mass}</span>
+            `;
+
+            card.addEventListener('click', () => showModal(element));
+
+            // Add 3D tilt effect
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 5;
+                const rotateY = (centerX - x) / 5;
+
+                card.style.transform = `translateZ(30px) scale(1.15) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+
+            return card;
+        }
+
+        // Convert group number to A/B notation
+        function getGroupNotation(group) {
+            if (!group) return 'N/A';
+
+            const groupMap = {
+                1: { roman: 'I', type: 'A' },
+                2: { roman: 'II', type: 'A' },
+                3: { roman: 'III', type: 'B' },
+                4: { roman: 'IV', type: 'B' },
+                5: { roman: 'V', type: 'B' },
+                6: { roman: 'VI', type: 'B' },
+                7: { roman: 'VII', type: 'B' },
+                8: { roman: 'VIII', type: 'B' },
+                9: { roman: 'VIII', type: 'B' },
+                10: { roman: 'VIII', type: 'B' },
+                11: { roman: 'I', type: 'B' },
+                12: { roman: 'II', type: 'B' },
+                13: { roman: 'III', type: 'A' },
+                14: { roman: 'IV', type: 'A' },
+                15: { roman: 'V', type: 'A' },
+                16: { roman: 'VI', type: 'A' },
+                17: { roman: 'VII', type: 'A' },
+                18: { roman: 'VIII', type: 'A' }
+            };
+
+            const info = groupMap[group];
+            if (info) {
+                return `${info.roman}${info.type}`;
+            }
+            return group.toString();
+        }
+
+        // Show modal
+        function showModal(element) {
+            document.getElementById('modalNumber').textContent = element.number;
+            document.getElementById('modalSymbolText').textContent = element.symbol;
+            document.getElementById('modalName').textContent = element.name;
+
+            // Set IPA pronunciation
+            const pronunciation = elementPronunciations[element.name];
+            const ipaText = document.getElementById('modalIPA');
+            if (ipaText && pronunciation) {
+                ipaText.textContent = pronunciation.ipa;
+            } else if (ipaText) {
+                ipaText.textContent = '';
+            }
+
+            // Setup speak button
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                speakBtn.onclick = () => speakElement(element.name);
+            }
+
+            document.getElementById('modalCategory').textContent = categoryNames[element.category];
+            document.getElementById('modalMass').textContent = element.mass + ' u';
+            document.getElementById('modalElectronegativity').textContent = element.electronegativity || 'N/A';
+            document.getElementById('modalPeriod').textContent = element.period;
+            document.getElementById('modalGroup').textContent = getGroupNotation(element.group);
+            document.getElementById('modalState').textContent = element.state;
+            document.getElementById('modalYear').textContent = element.year;
+            document.getElementById('modalConfig').textContent = element.config;
+            document.getElementById('modalFact').textContent = element.fact;
+
+            const modalSymbol = document.getElementById('modalSymbol');
+            modalSymbol.className = `modal-symbol ${element.category}`;
+            modalSymbol.style.setProperty('--element-color', `var(--${element.category})`);
+
+            const modal = document.getElementById('elementModal');
+            modal.style.borderColor = `var(--${element.category})`;
+
+            // Create 3D atom model
+            createAtomModel(element);
+
+            modalOverlay.classList.add('active');
+        }
+
+        // Three.js 3D atom model variables
+        let atomScene, atomCamera, atomRenderer, atomAnimationId;
+        let nucleusGroup, electronGroups = [];
+
+        // Create 3D atom model with Three.js
+        function createAtomModel(element) {
+            const container = document.getElementById('atomModel');
+            container.innerHTML = '';
+
+            // Clean up previous animation
+            if (atomAnimationId) {
+                cancelAnimationFrame(atomAnimationId);
+            }
+            if (atomRenderer) {
+                atomRenderer.dispose();
+            }
+
+            // Setup scene
+            atomScene = new THREE.Scene();
+
+            // Setup camera
+            atomCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+            atomCamera.position.z = 5;
+
+            // Setup renderer
+            atomRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            atomRenderer.setSize(150, 150);
+            atomRenderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(atomRenderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            atomScene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+            pointLight.position.set(5, 5, 5);
+            atomScene.add(pointLight);
+
+            const pointLight2 = new THREE.PointLight(0x00f5ff, 0.5, 100);
+            pointLight2.position.set(-5, -5, 5);
+            atomScene.add(pointLight2);
+
+            // Create nucleus group
+            nucleusGroup = new THREE.Group();
+
+            // Calculate protons and neutrons
+            const protons = element.number;
+            const neutrons = Math.round(element.mass) - protons;
+            const totalNucleons = protons + neutrons;
+
+            // Nucleus size based on nucleon count
+            const nucleusRadius = Math.min(0.4 + totalNucleons * 0.008, 0.8);
+            const nucleonSize = Math.max(0.08, nucleusRadius / (Math.cbrt(totalNucleons) * 1.2));
+
+            // Create protons (red spheres)
+            const protonGeometry = new THREE.SphereGeometry(nucleonSize, 16, 16);
+            const protonMaterial = new THREE.MeshPhongMaterial({
+                color: 0xff4444,
+                emissive: 0x441111,
+                shininess: 80,
+                specular: 0xffaaaa
+            });
+
+            // Create neutrons (blue/gray spheres)
+            const neutronGeometry = new THREE.SphereGeometry(nucleonSize, 16, 16);
+            const neutronMaterial = new THREE.MeshPhongMaterial({
+                color: 0x6688cc,
+                emissive: 0x112244,
+                shininess: 80,
+                specular: 0xaaccff
+            });
+
+            // Arrange nucleons in nucleus
+            const displayNucleons = Math.min(totalNucleons, 40); // Limit for performance
+            const protonRatio = protons / totalNucleons;
+
+            for (let i = 0; i < displayNucleons; i++) {
+                const isProton = i < Math.round(displayNucleons * protonRatio);
+                const nucleon = new THREE.Mesh(
+                    isProton ? protonGeometry : neutronGeometry,
+                    isProton ? protonMaterial : neutronMaterial
+                );
+
+                // Fibonacci sphere distribution for nucleons
+                const phi = Math.acos(1 - 2 * (i + 0.5) / displayNucleons);
+                const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+                const r = nucleusRadius * Math.cbrt((i + 1) / displayNucleons) * 0.9;
+
+                nucleon.position.x = r * Math.sin(phi) * Math.cos(theta);
+                nucleon.position.y = r * Math.sin(phi) * Math.sin(theta);
+                nucleon.position.z = r * Math.cos(phi);
+
+                // Add slight random offset for natural look
+                nucleon.position.x += (Math.random() - 0.5) * nucleonSize * 0.3;
+                nucleon.position.y += (Math.random() - 0.5) * nucleonSize * 0.3;
+                nucleon.position.z += (Math.random() - 0.5) * nucleonSize * 0.3;
+
+                nucleusGroup.add(nucleon);
+            }
+
+            atomScene.add(nucleusGroup);
+
+            // Create electron shells
+            electronGroups = [];
+            const shells = getElectronShells(element.number);
+            const orbitRadii = [1.2, 1.6, 2.0, 2.4, 2.8, 3.2, 3.6];
+
+            // Electron material (cyan glowing spheres)
+            const electronGeometry = new THREE.SphereGeometry(0.08, 16, 16);
+            const electronMaterial = new THREE.MeshPhongMaterial({
+                color: 0x00f5ff,
+                emissive: 0x00aaaa,
+                shininess: 100,
+                specular: 0xffffff
+            });
+
+            shells.forEach((electronCount, shellIndex) => {
+                if (electronCount > 0 && shellIndex < orbitRadii.length) {
+                    const shellGroup = new THREE.Group();
+                    const radius = orbitRadii[shellIndex];
+
+                    // Create orbit ring
+                    const orbitGeometry = new THREE.RingGeometry(radius - 0.01, radius + 0.01, 64);
+                    const orbitMaterial = new THREE.MeshBasicMaterial({
+                        color: 0x00f5ff,
+                        transparent: true,
+                        opacity: 0.2,
+                        side: THREE.DoubleSide
+                    });
+                    const orbitRing = new THREE.Mesh(orbitGeometry, orbitMaterial);
+                    orbitRing.rotation.x = Math.PI / 2;
+                    shellGroup.add(orbitRing);
+
+                    // Add electrons on this shell
+                    const displayElectrons = Math.min(electronCount, 8);
+                    for (let i = 0; i < displayElectrons; i++) {
+                        const electron = new THREE.Mesh(electronGeometry, electronMaterial);
+                        const angle = (2 * Math.PI / displayElectrons) * i;
+
+                        electron.position.x = radius * Math.cos(angle);
+                        electron.position.z = radius * Math.sin(angle);
+                        electron.position.y = 0;
+
+                        // Store initial angle for animation
+                        electron.userData.initialAngle = angle;
+                        electron.userData.radius = radius;
+                        electron.userData.speed = 1 + shellIndex * 0.3;
+
+                        shellGroup.add(electron);
+                    }
+
+                    // Tilt each shell differently
+                    shellGroup.rotation.x = (shellIndex * 25 + 60) * Math.PI / 180;
+                    shellGroup.rotation.y = (shellIndex * 40) * Math.PI / 180;
+
+                    electronGroups.push(shellGroup);
+                    atomScene.add(shellGroup);
+                }
+            });
+
+            // Animation
+            let time = 0;
+            function animate() {
+                atomAnimationId = requestAnimationFrame(animate);
+                time += 0.016;
+
+                // Rotate nucleus slowly
+                nucleusGroup.rotation.x += 0.005;
+                nucleusGroup.rotation.y += 0.008;
+
+                // Animate electrons orbiting
+                electronGroups.forEach((shellGroup, shellIndex) => {
+                    shellGroup.children.forEach(child => {
+                        if (child.userData.radius) {
+                            const speed = child.userData.speed;
+                            const angle = child.userData.initialAngle + time * speed;
+                            const radius = child.userData.radius;
+
+                            child.position.x = radius * Math.cos(angle);
+                            child.position.z = radius * Math.sin(angle);
+                        }
+                    });
+
+                    // Slight wobble for shells
+                    shellGroup.rotation.z = Math.sin(time * 0.5 + shellIndex) * 0.05;
+                });
+
+                atomRenderer.render(atomScene, atomCamera);
+            }
+
+            animate();
+        }
+
+        // Get electron shells from atomic number
+        function getElectronShells(atomicNumber) {
+            const maxPerShell = [2, 8, 18, 32, 32, 18, 8];
+            const shells = [];
+            let remaining = atomicNumber;
+
+            for (let i = 0; i < maxPerShell.length && remaining > 0; i++) {
+                const electrons = Math.min(remaining, maxPerShell[i]);
+                shells.push(electrons);
+                remaining -= electrons;
+            }
+
+            return shells;
+        }
+
+        // Close modal
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('.element').forEach(el => {
+                const element = elements.find(elem => elem.number == el.dataset.number);
+                const matches = element.symbol.toLowerCase().includes(query) ||
+                               element.name.toLowerCase().includes(query) ||
+                               element.number.toString().includes(query);
+                el.classList.toggle('hidden', !matches && query !== '');
+            });
+        });
+
+        // Filter functionality
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.dataset.filter;
+                document.querySelectorAll('.element').forEach(el => {
+                    const element = elements.find(elem => elem.number == el.dataset.number);
+                    let show = true;
+
+                    if (filter === 'metal') {
+                        show = ['alkali', 'alkaline', 'transition', 'post-transition', 'lanthanide', 'actinide'].includes(element.category);
+                    } else if (filter === 'nonmetal') {
+                        show = ['nonmetal', 'halogen'].includes(element.category);
+                    } else if (filter === 'gas') {
+                        show = element.category === 'noble';
+                    }
+
+                    el.classList.toggle('hidden', !show);
+                });
+            });
+        });
+
+        // Legend click
+        legendItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const category = item.dataset.category;
+                document.querySelectorAll('.element').forEach(el => {
+                    const element = elements.find(elem => elem.number == el.dataset.number);
+                    el.classList.toggle('hidden', element.category !== category);
+                });
+
+                // Reset filter buttons
+                filterBtns.forEach(b => b.classList.remove('active'));
+            });
+        });
+
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Add CSS for electron orbit animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes orbitElectron {
+                from { transform: rotate(0deg) translateX(0) rotate(0deg); }
+                to { transform: rotate(360deg) translateX(0) rotate(-360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize
+        window.addEventListener('load', () => {
+            createParticles();
+            buildPeriodicTable();
+
+            setTimeout(() => {
+                loading.classList.add('hidden');
+            }, 1500);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ==================== TAB NAVIGATION ====================
+        function initTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId + 'Tab') {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+        }
+
+        // ==================== MEMORY GAME ====================
+        const memoryGame = {
+            cards: [],
+            flippedCards: [],
+            matchedPairs: 0,
+            totalPairs: 6,
+            moves: 0,
+            score: 0,
+            timer: null,
+            seconds: 0,
+            isPlaying: false,
+            selectedElements: []
+        };
+
+        // Get elements by range
+        function getElementsByRange(range) {
+            switch(range) {
+                case '1-20':
+                    return elements.filter(e => e.number >= 1 && e.number <= 20);
+                case '1-36':
+                    return elements.filter(e => e.number >= 1 && e.number <= 36);
+                case '1-54':
+                    return elements.filter(e => e.number >= 1 && e.number <= 54);
+                case 'alkali':
+                    return elements.filter(e => e.category === 'alkali');
+                case 'halogen':
+                    return elements.filter(e => e.category === 'halogen');
+                case 'noble':
+                    return elements.filter(e => e.category === 'noble');
+                case 'random':
+                default:
+                    return [...elements].sort(() => Math.random() - 0.5).slice(0, 30);
+            }
+        }
+
+        // Shuffle array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Start memory game
+        function startMemoryGame() {
+            const range = document.getElementById('elementRange').value;
+            const availableElements = getElementsByRange(range);
+
+            if (availableElements.length < memoryGame.totalPairs) {
+                showGameMessage('Không đủ nguyên tố! Vui lòng chọn phạm vi khác.', 'info');
+                return;
+            }
+
+            // Reset game state
+            memoryGame.cards = [];
+            memoryGame.flippedCards = [];
+            memoryGame.matchedPairs = 0;
+            memoryGame.moves = 0;
+            memoryGame.score = 0;
+            memoryGame.seconds = 0;
+            memoryGame.isPlaying = true;
+
+            if (memoryGame.timer) clearInterval(memoryGame.timer);
+
+            // Select random elements
+            memoryGame.selectedElements = shuffleArray(availableElements).slice(0, memoryGame.totalPairs);
+
+            // Create card pairs (symbol + name)
+            const cardData = [];
+            memoryGame.selectedElements.forEach(element => {
+                cardData.push({
+                    id: element.number,
+                    type: 'symbol',
+                    symbol: element.symbol,
+                    number: element.number,
+                    name: element.name
+                });
+                cardData.push({
+                    id: element.number,
+                    type: 'name',
+                    symbol: element.symbol,
+                    number: element.number,
+                    name: element.name
+                });
+            });
+
+            memoryGame.cards = shuffleArray(cardData);
+
+            // Update UI
+            updateMemoryStats();
+            renderMemoryBoard();
+            startMemoryTimer();
+            showGameMessage('Lật thẻ để tìm cặp ký hiệu và tên nguyên tố!', 'info');
+        }
+
+        // Render memory board
+        function renderMemoryBoard() {
+            const board = document.getElementById('memoryBoard');
+            board.innerHTML = '';
+
+            // Calculate grid columns based on pairs
+            const cols = memoryGame.totalPairs <= 6 ? 4 : memoryGame.totalPairs <= 10 ? 5 : 6;
+            board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+            memoryGame.cards.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'memory-card';
+                cardEl.dataset.index = index;
+
+                cardEl.innerHTML = `
+                    <div class="card-face card-back"></div>
+                    <div class="card-face card-front ${card.type}-card">
+                        ${card.type === 'symbol'
+                            ? `<span class="card-number">${card.number}</span><span class="card-symbol">${card.symbol}</span>`
+                            : `<span class="card-name">${card.name}</span>`
+                        }
+                    </div>
+                `;
+
+                cardEl.addEventListener('click', () => flipCard(index));
+                board.appendChild(cardEl);
+            });
+        }
+
+        // Flip card
+        function flipCard(index) {
+            if (!memoryGame.isPlaying) return;
+
+            const card = memoryGame.cards[index];
+            const cardEl = document.querySelectorAll('.memory-card')[index];
+
+            // Can't flip if already flipped or matched
+            if (cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
+
+            // Can't flip more than 2 cards
+            if (memoryGame.flippedCards.length >= 2) return;
+
+            // Flip the card
+            cardEl.classList.add('flipped');
+            memoryGame.flippedCards.push({ index, card, element: cardEl });
+
+            // Check for match when 2 cards are flipped
+            if (memoryGame.flippedCards.length === 2) {
+                memoryGame.moves++;
+                updateMemoryStats();
+                checkMemoryMatch();
+            }
+        }
+
+        // Check for match
+        function checkMemoryMatch() {
+            const [first, second] = memoryGame.flippedCards;
+
+            if (first.card.id === second.card.id && first.card.type !== second.card.type) {
+                // Match found!
+                setTimeout(() => {
+                    first.element.classList.add('matched');
+                    second.element.classList.add('matched');
+                    memoryGame.matchedPairs++;
+                    memoryGame.score += Math.max(100 - memoryGame.moves * 2, 10);
+                    updateMemoryStats();
+                    memoryGame.flippedCards = [];
+
+                    showGameMessage(`✅ Đúng rồi! ${first.card.symbol} = ${first.card.name}`, 'success');
+
+                    // Check for win
+                    if (memoryGame.matchedPairs === memoryGame.totalPairs) {
+                        endMemoryGame();
+                    }
+                }, 500);
+            } else {
+                // No match
+                setTimeout(() => {
+                    first.element.classList.remove('flipped');
+                    second.element.classList.remove('flipped');
+                    memoryGame.flippedCards = [];
+                    showGameMessage('❌ Chưa đúng, thử lại nhé!', 'info');
+                }, 1000);
+            }
+        }
+
+        // Update memory stats
+        function updateMemoryStats() {
+            const movesEl = document.getElementById('memoryMoves');
+            const matchesEl = document.getElementById('memoryMatches');
+            const totalEl = document.getElementById('memoryTotal');
+            const scoreEl = document.getElementById('memoryScore');
+
+            if (movesEl) movesEl.textContent = memoryGame.moves;
+            if (matchesEl) matchesEl.textContent = memoryGame.matchedPairs;
+            if (totalEl) totalEl.textContent = memoryGame.totalPairs;
+            if (scoreEl) scoreEl.textContent = memoryGame.score;
+        }
+
+        // Start timer
+        function startMemoryTimer() {
+            memoryGame.timer = setInterval(() => {
+                memoryGame.seconds++;
+                const mins = Math.floor(memoryGame.seconds / 60).toString().padStart(2, '0');
+                const secs = (memoryGame.seconds % 60).toString().padStart(2, '0');
+                const timerEl = document.getElementById('memoryTimer');
+                if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        // End game
+        function endMemoryGame() {
+            memoryGame.isPlaying = false;
+            clearInterval(memoryGame.timer);
+
+            const mins = Math.floor(memoryGame.seconds / 60);
+            const secs = memoryGame.seconds % 60;
+
+            // Create victory overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'victory-overlay';
+            overlay.innerHTML = `
+                <div class="victory-content">
+                    <div class="victory-icon">🎉</div>
+                    <h2 class="victory-title">Xuất Sắc!</h2>
+                    <div class="victory-stats">
+                        <p class="victory-stat">⏱️ Thời gian: <span>${mins}:${secs.toString().padStart(2, '0')}</span></p>
+                        <p class="victory-stat">🎯 Số lượt lật: <span>${memoryGame.moves}</span></p>
+                        <p class="victory-stat">⭐ Điểm số: <span>${memoryGame.score}</span></p>
+                    </div>
+                    <div class="learned-elements">
+                        <p style="margin-bottom: 10px; color: var(--text-secondary);">Bạn đã học được:</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+                            ${memoryGame.selectedElements.map(e =>
+                                `<span style="background: rgba(0,245,255,0.2); padding: 5px 10px; border-radius: 15px; font-size: 0.9rem;">
+                                    <strong>${e.symbol}</strong> ${e.name}
+                                </span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="victory-btn" onclick="this.closest('.victory-overlay').remove(); startMemoryGame();">🔄 Chơi Lại</button>
+                        <button class="victory-btn" onclick="this.closest('.victory-overlay').remove();">✕ Đóng</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        // Show game message
+        function showGameMessage(msg, type) {
+            const msgEl = document.getElementById('memoryMessage');
+            if (msgEl) {
+                msgEl.textContent = msg;
+                msgEl.className = `game-message ${type}`;
+            }
+        }
+
+        // Memory game event listeners
+        function initMemoryGame() {
+            const startBtn = document.getElementById('startMemory');
+            if (startBtn) {
+                startBtn.addEventListener('click', startMemoryGame);
+            }
+
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    memoryGame.totalPairs = parseInt(btn.dataset.pairs);
+                });
+            });
+        }
+
+        // ==================== QUIZ GAME ====================
+        const quizGame = {
+            questions: [],
+            currentQuestion: 0,
+            totalQuestions: 10,
+            correct: 0,
+            score: 0,
+            mode: 'symbol',
+            timer: null,
+            timeLeft: 10,
+            isPlaying: false
+        };
+
+        // Generate quiz questions
+        function generateQuizQuestions() {
+            const availableElements = elements.filter(e => e.number <= 36); // First 36 elements
+            const questions = [];
+
+            const shuffledElements = shuffleArray(availableElements);
+
+            for (let i = 0; i < quizGame.totalQuestions; i++) {
+                const element = shuffledElements[i % shuffledElements.length];
+                const wrongAnswers = shuffleArray(availableElements.filter(e => e.number !== element.number)).slice(0, 3);
+
+                let question;
+                const mode = quizGame.mode === 'mixed'
+                    ? ['symbol', 'name', 'config'][Math.floor(Math.random() * 3)]
+                    : quizGame.mode;
+
+                switch(mode) {
+                    case 'symbol':
+                        question = {
+                            display: element.symbol,
+                            question: `Ký hiệu "${element.symbol}" là nguyên tố nào?`,
+                            answer: element.name,
+                            options: shuffleArray([element.name, ...wrongAnswers.map(e => e.name)]),
+                            element: element
+                        };
+                        break;
+                    case 'name':
+                        question = {
+                            display: element.name,
+                            question: `Nguyên tố "${element.name}" có ký hiệu gì?`,
+                            answer: element.symbol,
+                            options: shuffleArray([element.symbol, ...wrongAnswers.map(e => e.symbol)]),
+                            element: element
+                        };
+                        break;
+                    case 'config':
+                        question = {
+                            display: element.config,
+                            question: `Cấu hình electron này thuộc nguyên tố nào?`,
+                            answer: element.name,
+                            options: shuffleArray([element.name, ...wrongAnswers.map(e => e.name)]),
+                            element: element
+                        };
+                        break;
+                }
+
+                questions.push(question);
+            }
+
+            return questions;
+        }
+
+        // Start quiz
+        function startQuiz() {
+            quizGame.questions = generateQuizQuestions();
+            quizGame.currentQuestion = 0;
+            quizGame.correct = 0;
+            quizGame.score = 0;
+            quizGame.isPlaying = true;
+
+            updateQuizStats();
+            showQuestion();
+        }
+
+        // Show question
+        function showQuestion() {
+            if (quizGame.currentQuestion >= quizGame.totalQuestions) {
+                endQuiz();
+                return;
+            }
+
+            const q = quizGame.questions[quizGame.currentQuestion];
+            if (!q) return;
+
+            const symbolEl = document.getElementById('questionSymbol');
+            const textEl = document.getElementById('questionText');
+            const feedbackEl = document.getElementById('quizFeedback');
+            const optionsEl = document.getElementById('quizOptions');
+            const timerEl = document.getElementById('quizTimer');
+            const progressEl = document.getElementById('quizProgress');
+
+            if (symbolEl) symbolEl.textContent = q.display;
+            if (textEl) textEl.textContent = q.question;
+            if (feedbackEl) {
+                feedbackEl.textContent = '';
+                feedbackEl.className = 'quiz-feedback';
+            }
+
+            if (optionsEl) {
+                optionsEl.innerHTML = '';
+                q.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.className = 'quiz-option';
+                    btn.textContent = option;
+                    btn.addEventListener('click', () => selectAnswer(option, btn));
+                    optionsEl.appendChild(btn);
+                });
+            }
+
+            // Start timer
+            quizGame.timeLeft = 10;
+            if (timerEl) timerEl.textContent = quizGame.timeLeft;
+
+            if (quizGame.timer) clearInterval(quizGame.timer);
+            quizGame.timer = setInterval(() => {
+                quizGame.timeLeft--;
+                if (timerEl) timerEl.textContent = quizGame.timeLeft;
+
+                if (quizGame.timeLeft <= 0) {
+                    clearInterval(quizGame.timer);
+                    timeOut();
+                }
+            }, 1000);
+
+            // Update progress
+            const progress = ((quizGame.currentQuestion) / quizGame.totalQuestions) * 100;
+            if (progressEl) progressEl.style.width = progress + '%';
+        }
+
+        // Select answer
+        function selectAnswer(answer, btnEl) {
+            if (!quizGame.isPlaying) return;
+
+            clearInterval(quizGame.timer);
+
+            const q = quizGame.questions[quizGame.currentQuestion];
+            if (!q) return;
+
+            const isCorrect = answer === q.answer;
+            const feedbackEl = document.getElementById('quizFeedback');
+
+            // Disable all options
+            document.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.classList.add('disabled');
+                if (btn.textContent === q.answer) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            if (isCorrect) {
+                btnEl.classList.add('correct');
+                quizGame.correct++;
+                quizGame.score += 100 + quizGame.timeLeft * 10;
+                if (feedbackEl) {
+                    feedbackEl.textContent = `✅ Chính xác! ${q.element.symbol} = ${q.element.name}`;
+                    feedbackEl.className = 'quiz-feedback correct';
+                }
+            } else {
+                btnEl.classList.add('wrong');
+                if (feedbackEl) {
+                    feedbackEl.textContent = `❌ Sai rồi! Đáp án đúng là: ${q.answer}`;
+                    feedbackEl.className = 'quiz-feedback wrong';
+                }
+            }
+
+            updateQuizStats();
+
+            // Next question after delay
+            setTimeout(() => {
+                quizGame.currentQuestion++;
+                showQuestion();
+            }, 2000);
+        }
+
+        // Time out
+        function timeOut() {
+            const q = quizGame.questions[quizGame.currentQuestion];
+            if (!q) return;
+
+            const feedbackEl = document.getElementById('quizFeedback');
+
+            document.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.classList.add('disabled');
+                if (btn.textContent === q.answer) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            if (feedbackEl) {
+                feedbackEl.textContent = `⏰ Hết giờ! Đáp án: ${q.answer}`;
+                feedbackEl.className = 'quiz-feedback wrong';
+            }
+
+            setTimeout(() => {
+                quizGame.currentQuestion++;
+                showQuestion();
+            }, 2000);
+        }
+
+        // Update quiz stats
+        function updateQuizStats() {
+            const currentEl = document.getElementById('quizCurrent');
+            const correctEl = document.getElementById('quizCorrect');
+            const scoreEl = document.getElementById('quizScore');
+
+            if (currentEl) currentEl.textContent = quizGame.currentQuestion + 1;
+            if (correctEl) correctEl.textContent = quizGame.correct;
+            if (scoreEl) scoreEl.textContent = quizGame.score;
+        }
+
+        // End quiz
+        function endQuiz() {
+            quizGame.isPlaying = false;
+            clearInterval(quizGame.timer);
+
+            const percentage = Math.round((quizGame.correct / quizGame.totalQuestions) * 100);
+            let grade, icon;
+
+            if (percentage >= 90) { grade = 'Xuất sắc!'; icon = '🏆'; }
+            else if (percentage >= 70) { grade = 'Giỏi!'; icon = '🎉'; }
+            else if (percentage >= 50) { grade = 'Khá!'; icon = '👍'; }
+            else { grade = 'Cần cố gắng!'; icon = '💪'; }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'victory-overlay';
+            overlay.innerHTML = `
+                <div class="victory-content">
+                    <div class="victory-icon">${icon}</div>
+                    <h2 class="victory-title">${grade}</h2>
+                    <div class="victory-stats">
+                        <p class="victory-stat">✅ Đúng: <span>${quizGame.correct}/${quizGame.totalQuestions}</span></p>
+                        <p class="victory-stat">📊 Tỷ lệ: <span>${percentage}%</span></p>
+                        <p class="victory-stat">⭐ Điểm: <span>${quizGame.score}</span></p>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="victory-btn" onclick="this.closest('.victory-overlay').remove(); startQuiz();">🔄 Chơi Lại</button>
+                        <button class="victory-btn" onclick="this.closest('.victory-overlay').remove();">✕ Đóng</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            // Update progress bar to 100%
+            const progressEl = document.getElementById('quizProgress');
+            if (progressEl) progressEl.style.width = '100%';
+        }
+
+        // Quiz event listeners
+        function initQuizGame() {
+            const startBtn = document.getElementById('startQuiz');
+            if (startBtn) {
+                startBtn.addEventListener('click', startQuiz);
+            }
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    quizGame.mode = btn.dataset.mode;
+                });
+            });
+        }
+
+        // Initialize all games when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initTabs();
+            initMemoryGame();
+            initQuizGame();
+        });
+    </script>
+</body>
+</html>
+
+
+
