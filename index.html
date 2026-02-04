@@ -801,6 +801,1178 @@
             visibility: hidden;
         }
 
+        /* ==================== 3D SPIRAL TAB ==================== */
+        .spiral-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .spiral-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .spiral-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            background: linear-gradient(135deg, var(--glow-cyan), var(--glow-purple), var(--glow-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .spiral-desc {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .spiral-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+        }
+
+        .spiral-control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .spiral-control-group label {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .spiral-btn {
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(184, 41, 255, 0.3);
+            border-radius: 25px;
+            color: var(--text-primary);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .spiral-btn:hover {
+            background: rgba(184, 41, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .spiral-btn.active {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.4), rgba(184, 41, 255, 0.4));
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
+        }
+
+        .spiral-slider {
+            width: 120px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(90deg, var(--glow-cyan), var(--glow-purple));
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .spiral-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--glow-cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--glow-cyan);
+            transition: all 0.2s ease;
+        }
+
+        .spiral-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px var(--glow-cyan);
+        }
+
+        .spiral-reset-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--glow-purple), var(--glow-pink));
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .spiral-reset-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 25px rgba(184, 41, 255, 0.5);
+        }
+
+        .spiral-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        .spiral-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .spiral-legend-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .spiral-legend-item.highlighted {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+        }
+
+        .leg-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .spiral-3d-wrapper {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            min-height: 500px;
+            max-height: 800px;
+            background: radial-gradient(ellipse at center, rgba(20, 20, 60, 0.8) 0%, rgba(10, 10, 30, 0.95) 100%);
+            border-radius: 20px;
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            overflow: hidden;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                inset 0 0 100px rgba(0, 245, 255, 0.05);
+        }
+
+        #spiral3DCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        #spiral3DCanvas canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .spiral-element-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 245, 255, 0.4);
+            min-width: 180px;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .spiral-element-info.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .spiral-element-info .info-symbol {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 5px;
+            text-shadow: 0 0 20px currentColor;
+        }
+
+        .spiral-element-info .info-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .spiral-element-info .info-details {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .spiral-instructions {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding: 10px;
+        }
+
+        .spiral-instructions span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .spiral-3d-wrapper {
+                height: 60vh;
+                min-height: 400px;
+            }
+
+            .spiral-controls {
+                padding: 10px;
+                gap: 12px;
+            }
+
+            .spiral-control-group {
+                width: 100%;
+            }
+
+            .spiral-element-info {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+
+            .spiral-instructions {
+                gap: 10px;
+            }
+
+            .spiral-instructions span {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+        }
+
+        /* ==================== COMPARISON MODE ==================== */
+        .comparison-controls {
+            max-width: 1200px;
+            margin: 0 auto 15px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.08), rgba(184, 41, 255, 0.08));
+            border-radius: 15px;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+        }
+
+        .comparison-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .comparison-icon {
+            font-size: 1.3rem;
+        }
+
+        .comparison-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--glow-cyan);
+        }
+
+        .comparison-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .compare-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            color: var(--text-primary);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .compare-btn:hover {
+            background: rgba(0, 245, 255, 0.15);
+            border-color: rgba(0, 245, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .compare-btn.active {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.3), rgba(184, 41, 255, 0.3));
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .compare-btn .btn-icon {
+            font-size: 1.1rem;
+        }
+
+        .comparison-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 10px;
+            min-height: 40px;
+        }
+
+        .comparison-legend.visible {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .comp-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .comp-legend-bar {
+            height: 20px;
+            width: 150px;
+            border-radius: 10px;
+        }
+
+        .comp-legend-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 150px;
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        .comparison-info {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .comparison-info strong {
+            color: var(--glow-cyan);
+        }
+
+        /* Element comparison states */
+        .element.compare-mode {
+            transition: all 0.4s ease;
+        }
+
+        .element.compare-mode .symbol {
+            transition: all 0.3s ease;
+        }
+
+        /* Radius comparison - scale effect */
+        .element.radius-scale {
+            transform-origin: center center;
+        }
+
+        .element.radius-scale .radius-indicator {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        /* Electronegativity - glow intensity */
+        .element.electro-mode {
+            position: relative;
+            overflow: visible;
+        }
+
+        .element.electro-mode::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .electro-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: electroPulse 2s ease-out infinite;
+        }
+
+        @keyframes electroPulse {
+            0% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(2);
+            }
+        }
+
+        /* Metallic character gradient */
+        .metallic-gradient {
+            background: linear-gradient(90deg,
+                #ffd700 0%,      /* Most metallic - gold */
+                #c0c0c0 25%,     /* Silver */
+                #b87333 50%,     /* Bronze/Copper */
+                #a8a8a8 75%,     /* Transitional */
+                #6b7280 100%    /* Least metallic */
+            ) !important;
+        }
+
+        /* Non-metallic character gradient */
+        .nonmetallic-gradient {
+            background: linear-gradient(90deg,
+                #6b7280 0%,      /* Least non-metallic */
+                #60a5fa 25%,     /* Transitional */
+                #34d399 50%,     /* Semi non-metallic */
+                #a78bfa 75%,     /* High non-metallic */
+                #f472b6 100%    /* Most non-metallic */
+            ) !important;
+        }
+
+        /* Comparison mode indicators */
+        .element .compare-value {
+            position: absolute;
+            bottom: 2px;
+            right: 3px;
+            font-size: 8px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1px 3px;
+            border-radius: 3px;
+        }
+
+        .element.compare-mode .compare-value {
+            opacity: 1;
+        }
+
+        /* Trend arrows */
+        .trend-arrows-container {
+            position: relative;
+            display: none;
+            margin: 20px auto;
+            max-width: 1450px;
+            padding: 20px;
+        }
+
+        .trend-arrows-container.visible {
+            display: block;
+        }
+
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(184, 41, 255, 0.1));
+            border-radius: 15px;
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            margin-bottom: 15px;
+        }
+
+        .trend-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .trend-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            padding: 8px 15px;
+            border-radius: 20px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .trend-label.metallic {
+            background: linear-gradient(90deg, #ffd700, #c0c0c0);
+            color: #1a1a2e;
+        }
+
+        .trend-label.nonmetallic {
+            background: linear-gradient(90deg, #a78bfa, #f472b6);
+            color: white;
+        }
+
+        .trend-arrow-icon {
+            font-size: 28px;
+            animation: arrowPulse 1.5s ease-in-out infinite;
+        }
+
+        .trend-arrow-icon.right {
+            color: #f472b6;
+        }
+
+        .trend-arrow-icon.down {
+            color: #ffd700;
+        }
+
+        @keyframes arrowPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .trend-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .trend-description strong {
+            color: var(--glow-cyan);
+        }
+
+        .table-with-arrows {
+            position: relative;
+        }
+
+        .side-arrow {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        .side-arrow.horizontal {
+            top: 50%;
+            right: -80px;
+            transform: translateY(-50%);
+            writing-mode: horizontal-tb;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .side-arrow.vertical {
+            bottom: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            flex-direction: row;
+            gap: 10px;
+        }
+
+        .side-arrow-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .side-arrow-icon {
+            font-size: 24px;
+        }
+
+        /* ==================== CHARACTERS SECTION ==================== */
+        .characters-section {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .character-card {
+            flex: 1;
+            min-width: 280px;
+            max-width: 350px;
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metallic-char {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(192, 192, 192, 0.2));
+            border: 2px solid #ffd700;
+            box-shadow: 0 5px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .nonmetallic-char {
+            background: linear-gradient(135deg, rgba(244, 114, 182, 0.2), rgba(167, 139, 250, 0.2));
+            border: 2px solid #f472b6;
+            box-shadow: 0 5px 30px rgba(244, 114, 182, 0.3);
+        }
+
+        .character-avatar {
+            width: 120px;
+            height: 140px;
+            margin: 0 auto 15px;
+            position: relative;
+        }
+
+        /* Anh Kim Loại Character */
+        .metallic-body {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .char-head {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto;
+        }
+
+        .char-helmet {
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 65px;
+            height: 35px;
+            background: linear-gradient(180deg, #ffd700, #b8860b);
+            border-radius: 35px 35px 10px 10px;
+            z-index: 2;
+        }
+
+        .helmet-spike {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 20px solid #ffd700;
+        }
+
+        .char-face {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 45px;
+            background: linear-gradient(180deg, #ffecd2, #fcb69f);
+            border-radius: 25px 25px 20px 20px;
+            z-index: 1;
+        }
+
+        .char-eyes {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 12px;
+        }
+
+        .char-eye {
+            width: 8px;
+            height: 8px;
+            background: #333;
+            border-radius: 50%;
+            animation: blink 3s infinite;
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        .char-mouth.happy {
+            width: 15px;
+            height: 8px;
+            background: transparent;
+            border: 3px solid #e74c3c;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            margin: 8px auto 0;
+        }
+
+        .char-torso.metallic-armor {
+            position: absolute;
+            top: 65px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 50px;
+            background: linear-gradient(180deg, #c0c0c0, #808080);
+            border-radius: 10px 10px 20px 20px;
+            border: 3px solid #ffd700;
+        }
+
+        .armor-detail {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 25px;
+            background: linear-gradient(180deg, #ffd700, #b8860b);
+            border-radius: 5px;
+        }
+
+        .char-arm {
+            position: absolute;
+            width: 25px;
+            height: 35px;
+        }
+
+        .char-arm.left {
+            left: -20px;
+            top: 5px;
+            animation: flexArm 1s ease-in-out infinite;
+        }
+
+        .char-arm.right {
+            right: -20px;
+            top: 5px;
+        }
+
+        @keyframes flexArm {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .muscle-flex {
+            font-size: 24px;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .giving-hand {
+            position: relative;
+        }
+
+        .electron-give {
+            position: absolute;
+            top: 0;
+            right: -10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #00f5ff;
+            animation: giveElectron 2s ease-in-out infinite;
+        }
+
+        @keyframes giveElectron {
+            0% { transform: translateX(0); opacity: 1; }
+            50% { transform: translateX(30px); opacity: 0.5; }
+            100% { transform: translateX(60px); opacity: 0; }
+        }
+
+        .char-shield {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 28px;
+            animation: shieldBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes shieldBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* Cô Phi Kim Character */
+        .nonmetallic-body {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .char-hair {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 40px;
+        }
+
+        .hair-strand {
+            position: absolute;
+            width: 20px;
+            height: 35px;
+            background: linear-gradient(180deg, #8b5cf6, #6d28d9);
+            border-radius: 50% 50% 45% 45%;
+        }
+
+        .hair-strand.s1 { left: 5px; transform: rotate(-15deg); }
+        .hair-strand.s2 { left: 25px; top: -5px; }
+        .hair-strand.s3 { left: 45px; transform: rotate(15deg); }
+
+        .flower-accessory {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 20px;
+            animation: flowerSway 2s ease-in-out infinite;
+        }
+
+        @keyframes flowerSway {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .nonmetallic-body .char-face {
+            top: 25px;
+            background: linear-gradient(180deg, #ffe4ec, #ffc0cb);
+        }
+
+        .char-eyes.cute .char-eye {
+            background: #6d28d9;
+            width: 10px;
+            height: 10px;
+        }
+
+        .char-eye.sparkle::after {
+            content: '✨';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 8px;
+            animation: sparkleAnim 1s ease-in-out infinite;
+        }
+
+        @keyframes sparkleAnim {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .char-blush {
+            position: absolute;
+            width: 12px;
+            height: 6px;
+            background: rgba(255, 100, 100, 0.5);
+            border-radius: 50%;
+            top: 25px;
+        }
+
+        .char-blush.left { left: 5px; }
+        .char-blush.right { right: 5px; }
+
+        .char-mouth.smile {
+            width: 12px;
+            height: 6px;
+            background: #e74c3c;
+            border-radius: 0 0 12px 12px;
+            margin: 6px auto 0;
+        }
+
+        .char-torso.nonmetallic-dress {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 55px;
+            background: linear-gradient(180deg, #f472b6, #ec4899);
+            border-radius: 15px 15px 30px 30px;
+            border: 2px solid #db2777;
+        }
+
+        .dress-pattern {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        .nonmetallic-body .char-arm.left {
+            left: -15px;
+            top: 0;
+            animation: wave 1.5s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-20deg); }
+            75% { transform: rotate(20deg); }
+        }
+
+        .receiving-hand {
+            position: relative;
+        }
+
+        .gift-icon {
+            font-size: 22px;
+            animation: receiveGift 2s ease-in-out infinite;
+        }
+
+        @keyframes receiveGift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(10deg); }
+        }
+
+        .electron-receive {
+            position: absolute;
+            font-size: 14px;
+            font-weight: bold;
+            color: #00f5ff;
+            animation: receiveElectron 2s ease-in-out infinite;
+        }
+
+        @keyframes receiveElectron {
+            0% { transform: translateX(-60px); opacity: 0; }
+            50% { transform: translateX(-30px); opacity: 0.5; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        .sparkles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .sparkles .sparkle {
+            position: absolute;
+            font-size: 16px;
+            animation: floatSparkle 3s ease-in-out infinite;
+        }
+
+        .sparkle.s1 { top: 10%; left: 10%; animation-delay: 0s; }
+        .sparkle.s2 { top: 30%; right: 5%; animation-delay: 1s; }
+        .sparkle.s3 { bottom: 20%; left: 20%; animation-delay: 2s; }
+
+        @keyframes floatSparkle {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+            50% { transform: translateY(-10px) scale(1.2); opacity: 0.7; }
+        }
+
+        /* Character Info */
+        .character-info {
+            margin-top: 10px;
+        }
+
+        .char-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .metallic-name {
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .nonmetallic-name {
+            color: #f472b6;
+            text-shadow: 0 0 10px rgba(244, 114, 182, 0.5);
+        }
+
+        .char-traits {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .trait {
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .char-quote {
+            font-style: italic;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* Electron Transfer Animation */
+        .electron-transfer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+        }
+
+        .transfer-arrow {
+            display: flex;
+            gap: 10px;
+            font-size: 18px;
+            color: #00f5ff;
+        }
+
+        .electron-particle {
+            animation: moveRight 2s linear infinite;
+            text-shadow: 0 0 10px #00f5ff;
+        }
+
+        .electron-particle.delay1 { animation-delay: 0.5s; }
+        .electron-particle.delay2 { animation-delay: 1s; }
+
+        @keyframes moveRight {
+            0% { transform: translateX(-30px); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateX(30px); opacity: 0; }
+        }
+
+        .transfer-text {
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--glow-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Slogan Section */
+        .slogan-section {
+            margin-bottom: 20px;
+        }
+
+        .slogan-box {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(244, 114, 182, 0.15));
+            border: 2px solid;
+            border-image: linear-gradient(90deg, #ffd700, #f472b6) 1;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .slogan-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .slogan-icon {
+            font-size: 24px;
+        }
+
+        .slogan-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .metallic-text {
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .nonmetallic-text {
+            color: #f472b6;
+            text-shadow: 0 0 10px rgba(244, 114, 182, 0.5);
+        }
+
+        .slogan-divider {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .characters-section {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .character-card {
+                min-width: 250px;
+            }
+
+            .electron-transfer {
+                transform: rotate(90deg);
+                margin: 20px 0;
+            }
+
+            .slogan-text {
+                font-size: 0.9rem;
+            }
+
+            .comparison-controls {
+                padding: 12px 15px;
+            }
+
+            .compare-btn {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+
+            .compare-btn .btn-icon {
+                font-size: 1rem;
+            }
+
+            .comp-legend-bar {
+                width: 100px;
+            }
+
+            .comp-legend-labels {
+                width: 100px;
+            }
+        }
+
         /* Tab Navigation */
         .tab-nav {
             display: flex;
@@ -1313,6 +2485,506 @@
             box-shadow: 0 0 25px rgba(0, 245, 255, 0.5);
         }
 
+        /* ==================== TRIVIA 50 QUESTIONS STYLES ==================== */
+        .trivia-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .trivia-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .trivia-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            background: linear-gradient(135deg, #00f5ff, #ff6b6b, #ffd43b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .trivia-desc {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .trivia-stats {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .trivia-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .trivia-category-selector,
+        .trivia-difficulty-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .trivia-category-selector label,
+        .trivia-difficulty-selector label {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .trivia-category-selector select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 15px;
+            padding: 10px 15px;
+            color: var(--text-primary);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .trivia-category-selector select:focus {
+            outline: none;
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+        }
+
+        .trivia-diff-btn {
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 107, 107, 0.3);
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-family: 'Exo 2', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .trivia-diff-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .trivia-diff-btn.active {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.4), rgba(255, 212, 59, 0.4));
+            border-color: #ff6b6b;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .trivia-game-area {
+            position: relative;
+        }
+
+        .trivia-question-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+            border: 2px solid rgba(0, 245, 255, 0.2);
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trivia-question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00f5ff, #b829ff, #ff6b6b);
+        }
+
+        .trivia-question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .trivia-category-badge {
+            padding: 6px 14px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(184, 41, 255, 0.2));
+            border: 1px solid rgba(0, 245, 255, 0.4);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--glow-cyan);
+            font-weight: 600;
+        }
+
+        .trivia-difficulty-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .trivia-difficulty-badge.easy {
+            background: rgba(105, 219, 124, 0.2);
+            border: 1px solid #69db7c;
+            color: #69db7c;
+        }
+
+        .trivia-difficulty-badge.medium {
+            background: rgba(255, 212, 59, 0.2);
+            border: 1px solid #ffd43b;
+            color: #ffd43b;
+        }
+
+        .trivia-difficulty-badge.hard {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .trivia-question-text {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            min-height: 80px;
+        }
+
+        .trivia-hint {
+            padding: 15px 20px;
+            background: rgba(255, 212, 59, 0.1);
+            border-left: 4px solid #ffd43b;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 20px;
+            color: #ffd43b;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .trivia-hint.visible {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .trivia-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .trivia-option {
+            padding: 18px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            color: var(--text-primary);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trivia-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(0, 245, 255, 0.1), transparent);
+            transition: width 0.3s ease;
+        }
+
+        .trivia-option:hover:not(.disabled)::before {
+            width: 100%;
+        }
+
+        .trivia-option:hover:not(.disabled) {
+            border-color: var(--glow-cyan);
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .trivia-option.correct {
+            background: rgba(105, 219, 124, 0.3);
+            border-color: #69db7c;
+            animation: correctPulse 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(105, 219, 124, 0.5); }
+            50% { box-shadow: 0 0 30px 10px rgba(105, 219, 124, 0.3); }
+        }
+
+        .trivia-option.wrong {
+            background: rgba(255, 107, 107, 0.3);
+            border-color: #ff6b6b;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .trivia-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .trivia-feedback {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .trivia-feedback.correct {
+            display: block;
+            background: rgba(105, 219, 124, 0.2);
+            color: #69db7c;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .trivia-feedback.wrong {
+            display: block;
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .trivia-explanation {
+            padding: 20px;
+            background: rgba(184, 41, 255, 0.1);
+            border: 1px solid rgba(184, 41, 255, 0.3);
+            border-radius: 15px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .trivia-explanation.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .trivia-progress-container {
+            margin-bottom: 20px;
+        }
+
+        .trivia-progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .trivia-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f5ff, #b829ff, #ff6b6b);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        .trivia-progress-dots {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .trivia-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .trivia-dot.current {
+            background: var(--glow-cyan);
+            box-shadow: 0 0 10px var(--glow-cyan);
+            transform: scale(1.3);
+        }
+
+        .trivia-dot.correct {
+            background: #69db7c;
+        }
+
+        .trivia-dot.wrong {
+            background: #ff6b6b;
+        }
+
+        .trivia-dot.skipped {
+            background: #868e96;
+        }
+
+        .trivia-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .trivia-action-btn {
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid;
+        }
+
+        .trivia-action-btn.hint-btn {
+            background: rgba(255, 212, 59, 0.1);
+            border-color: rgba(255, 212, 59, 0.5);
+            color: #ffd43b;
+        }
+
+        .trivia-action-btn.hint-btn:hover:not(:disabled) {
+            background: rgba(255, 212, 59, 0.2);
+            box-shadow: 0 0 20px rgba(255, 212, 59, 0.3);
+        }
+
+        .trivia-action-btn.skip-btn {
+            background: rgba(134, 142, 150, 0.1);
+            border-color: rgba(134, 142, 150, 0.5);
+            color: #868e96;
+        }
+
+        .trivia-action-btn.skip-btn:hover:not(:disabled) {
+            background: rgba(134, 142, 150, 0.2);
+            box-shadow: 0 0 20px rgba(134, 142, 150, 0.3);
+        }
+
+        .trivia-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Trivia Results Modal */
+        .trivia-results-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.5s ease;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .trivia-results-content {
+            background: linear-gradient(145deg, var(--bg-secondary), var(--bg-primary));
+            border: 3px solid var(--glow-cyan);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            animation: victoryPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .trivia-results-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .trivia-results-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--glow-cyan), var(--glow-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .trivia-results-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .trivia-result-stat {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .trivia-result-stat-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .trivia-result-stat-value {
+            display: block;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--glow-cyan);
+        }
+
+        .trivia-results-grade {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(184, 41, 255, 0.1));
+            border-radius: 20px;
+            margin-bottom: 25px;
+        }
+
+        .trivia-grade-label {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .trivia-grade-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: var(--glow-purple);
+        }
+
+        .trivia-results-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
         /* Loading animation */
         .loading {
             position: fixed;
@@ -1399,6 +3071,14 @@
             <span class="tab-icon">❓</span>
             <span>Đố Vui Nguyên Tố</span>
         </button>
+        <button class="tab-btn" data-tab="spiral">
+            <span class="tab-icon">🌀</span>
+            <span>3D Xoắn Ốc</span>
+        </button>
+        <button class="tab-btn" data-tab="trivia">
+            <span class="tab-icon">🧪</span>
+            <span>50 Câu Hỏi Hóa Học</span>
+        </button>
     </nav>
 
     <!-- Tab: Table -->
@@ -1412,6 +3092,34 @@
             <button class="filter-btn" data-filter="metal">Kim loại</button>
             <button class="filter-btn" data-filter="nonmetal">Phi kim</button>
             <button class="filter-btn" data-filter="gas">Khí hiếm</button>
+        </div>
+
+        <!-- Comparison Mode Controls -->
+        <div class="comparison-controls">
+            <div class="comparison-header">
+                <span class="comparison-icon">📊</span>
+                <span class="comparison-title">Chế độ so sánh</span>
+            </div>
+            <div class="comparison-buttons">
+                <button class="compare-btn" data-compare="none">
+                    <span class="btn-icon">🔲</span>
+                    <span>Mặc định</span>
+                </button>
+                <button class="compare-btn" data-compare="radius">
+                    <span class="btn-icon">⭕</span>
+                    <span>Bán kính</span>
+                </button>
+                <button class="compare-btn" data-compare="electronegativity">
+                    <span class="btn-icon">⚡</span>
+                    <span>Độ âm điện</span>
+                </button>
+                <button class="compare-btn" data-compare="metallic-nonmetallic">
+                    <span class="btn-icon">🔩💎</span>
+                    <span>Tính KL/PK</span>
+                </button>
+            </div>
+            <div class="comparison-legend" id="comparisonLegend"></div>
+            <div class="comparison-info" id="comparisonInfo"></div>
         </div>
 
         <!-- Legend -->
@@ -1455,6 +3163,154 @@
             <div class="legend-item" data-category="actinide">
                 <div class="legend-color" style="background: var(--actinide)"></div>
                 <span>Actinit</span>
+            </div>
+        </div>
+
+        <!-- Trend Arrows Indicator -->
+        <div class="trend-arrows-container" id="trendArrowsContainer">
+            <!-- Characters Section -->
+            <div class="characters-section">
+                <!-- Anh Kim Loại -->
+                <div class="character-card metallic-char">
+                    <div class="character-avatar metallic-avatar">
+                        <div class="char-body metallic-body">
+                            <div class="char-head">
+                                <div class="char-helmet">
+                                    <div class="helmet-spike"></div>
+                                </div>
+                                <div class="char-face">
+                                    <div class="char-eyes">
+                                        <div class="char-eye left"></div>
+                                        <div class="char-eye right"></div>
+                                    </div>
+                                    <div class="char-mouth happy"></div>
+                                </div>
+                            </div>
+                            <div class="char-torso metallic-armor">
+                                <div class="armor-detail"></div>
+                                <div class="char-arm left">
+                                    <div class="muscle-flex">💪</div>
+                                </div>
+                                <div class="char-arm right">
+                                    <div class="giving-hand">
+                                        <span class="electron-give">e⁻</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="char-shield">⚔️</div>
+                        </div>
+                    </div>
+                    <div class="character-info">
+                        <h3 class="char-name metallic-name">🔩 Anh Kim Loại</h3>
+                        <div class="char-traits">
+                            <span class="trait">💪 To khỏe</span>
+                            <span class="trait">⚔️ Áo giáp</span>
+                            <span class="trait">🎁 Cho e⁻</span>
+                        </div>
+                        <p class="char-quote">"Mình mạnh mẽ, thích NHƯỜNG electron!"</p>
+                    </div>
+                </div>
+
+                <!-- Transfer Animation -->
+                <div class="electron-transfer">
+                    <div class="transfer-arrow">
+                        <span class="electron-particle">e⁻</span>
+                        <span class="electron-particle delay1">e⁻</span>
+                        <span class="electron-particle delay2">e⁻</span>
+                    </div>
+                    <div class="transfer-text">NHƯỜNG → NHẬN</div>
+                </div>
+
+                <!-- Cô Phi Kim -->
+                <div class="character-card nonmetallic-char">
+                    <div class="character-avatar nonmetallic-avatar">
+                        <div class="char-body nonmetallic-body">
+                            <div class="char-head">
+                                <div class="char-hair">
+                                    <div class="hair-strand s1"></div>
+                                    <div class="hair-strand s2"></div>
+                                    <div class="hair-strand s3"></div>
+                                    <div class="flower-accessory">🌸</div>
+                                </div>
+                                <div class="char-face">
+                                    <div class="char-eyes cute">
+                                        <div class="char-eye left sparkle"></div>
+                                        <div class="char-eye right sparkle"></div>
+                                    </div>
+                                    <div class="char-blush left"></div>
+                                    <div class="char-blush right"></div>
+                                    <div class="char-mouth smile"></div>
+                                </div>
+                            </div>
+                            <div class="char-torso nonmetallic-dress">
+                                <div class="dress-pattern"></div>
+                                <div class="char-arm left receiving">
+                                    <div class="receiving-hand">
+                                        <span class="gift-icon">🎁</span>
+                                    </div>
+                                </div>
+                                <div class="char-arm right">
+                                    <span class="electron-receive">e⁻</span>
+                                </div>
+                            </div>
+                            <div class="sparkles">
+                                <span class="sparkle s1">✨</span>
+                                <span class="sparkle s2">✨</span>
+                                <span class="sparkle s3">✨</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="character-info">
+                        <h3 class="char-name nonmetallic-name">💎 Cô Phi Kim</h3>
+                        <div class="char-traits">
+                            <span class="trait">🌸 Nhẹ nhàng</span>
+                            <span class="trait">🎁 Thích quà</span>
+                            <span class="trait">💝 Nhận e⁻</span>
+                        </div>
+                        <p class="char-quote">"Mình dễ thương, thích NHẬN electron!"</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slogan -->
+            <div class="slogan-section">
+                <div class="slogan-box">
+                    <div class="slogan-line">
+                        <span class="slogan-icon">🔩</span>
+                        <span class="slogan-text metallic-text">Kim loại CHO</span>
+                        <span class="slogan-divider">–</span>
+                        <span class="slogan-text nonmetallic-text">Phi kim NHẬN</span>
+                        <span class="slogan-icon">💎</span>
+                    </div>
+                    <div class="slogan-line">
+                        <span class="slogan-icon">⬅️</span>
+                        <span class="slogan-text metallic-text">TRÁI kim loại</span>
+                        <span class="slogan-divider">–</span>
+                        <span class="slogan-text nonmetallic-text">PHẢI phi kim</span>
+                        <span class="slogan-icon">➡️</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trend Indicators -->
+            <div class="trend-indicator">
+                <div class="trend-row">
+                    <span class="trend-label metallic">🔩 Tính Kim Loại</span>
+                    <span class="trend-arrow-icon">⬅️</span>
+                    <span class="trend-description">giảm dần</span>
+                    <span class="trend-arrow-icon right">➡️</span>
+                    <span class="trend-label nonmetallic">💎 Tính Phi Kim</span>
+                    <span class="trend-description">tăng dần</span>
+                </div>
+            </div>
+            <div class="trend-indicator">
+                <div class="trend-row">
+                    <span class="trend-arrow-icon down">⬇️</span>
+                    <span class="trend-label metallic">🔩 Tính Kim Loại tăng</span>
+                    <span style="margin: 0 20px; color: var(--text-secondary);">|</span>
+                    <span class="trend-arrow-icon" style="color: #a78bfa;">⬆️</span>
+                    <span class="trend-label nonmetallic">💎 Tính Phi Kim tăng</span>
+                </div>
             </div>
         </div>
 
@@ -1580,6 +3436,144 @@
         </div>
     </div>
 
+    <!-- Tab: Trivia 50 Questions -->
+    <div id="triviaTab" class="tab-content">
+        <div class="trivia-container">
+            <div class="trivia-header">
+                <h2 class="trivia-title">🧪 50 Câu Hỏi Hóa Học</h2>
+                <p class="trivia-desc">Khám phá lịch sử, nguồn gốc, tính chất và ứng dụng của các nguyên tố!</p>
+            </div>
+
+            <div class="trivia-stats">
+                <div class="stat-box">
+                    <span class="stat-icon">❓</span>
+                    <span class="stat-label">Câu hỏi</span>
+                    <span class="stat-value"><span id="triviaCurrent">0</span>/50</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-icon">✅</span>
+                    <span class="stat-label">Đúng</span>
+                    <span class="stat-value" id="triviaCorrect">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-icon">❌</span>
+                    <span class="stat-label">Sai</span>
+                    <span class="stat-value" id="triviaWrong">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-icon">⭐</span>
+                    <span class="stat-label">Điểm</span>
+                    <span class="stat-value" id="triviaScore">0</span>
+                </div>
+            </div>
+
+            <div class="trivia-controls">
+                <div class="trivia-category-selector">
+                    <label>Chủ đề:</label>
+                    <select id="triviaCategory">
+                        <option value="all">Tất cả chủ đề</option>
+                        <option value="history">Lịch sử & Nguồn gốc</option>
+                        <option value="physical">Tính chất Vật lý</option>
+                        <option value="chemical">Tính chất Hóa học</option>
+                        <option value="application">Ứng dụng</option>
+                        <option value="discovery">Phát hiện & Nhà khoa học</option>
+                    </select>
+                </div>
+                <div class="trivia-difficulty-selector">
+                    <label>Độ khó:</label>
+                    <button class="trivia-diff-btn active" data-difficulty="easy">Dễ</button>
+                    <button class="trivia-diff-btn" data-difficulty="medium">Trung bình</button>
+                    <button class="trivia-diff-btn" data-difficulty="hard">Khó</button>
+                </div>
+                <button class="start-btn" id="startTrivia">🚀 Bắt Đầu Thử Thách</button>
+            </div>
+
+            <div class="trivia-game-area" id="triviaGameArea">
+                <div class="trivia-question-card" id="triviaQuestionCard">
+                    <div class="trivia-question-header">
+                        <span class="trivia-category-badge" id="triviaCategoryBadge">Lịch sử</span>
+                        <span class="trivia-difficulty-badge" id="triviaDifficultyBadge">Dễ</span>
+                    </div>
+                    <div class="trivia-question-text" id="triviaQuestionText">
+                        Nhấn "Bắt Đầu Thử Thách" để bắt đầu!
+                    </div>
+                    <div class="trivia-hint" id="triviaHint"></div>
+                    <div class="trivia-options" id="triviaOptions"></div>
+                    <div class="trivia-feedback" id="triviaFeedback"></div>
+                    <div class="trivia-explanation" id="triviaExplanation"></div>
+                </div>
+
+                <div class="trivia-progress-container">
+                    <div class="trivia-progress-bar">
+                        <div class="trivia-progress-fill" id="triviaProgressFill"></div>
+                    </div>
+                    <div class="trivia-progress-dots" id="triviaProgressDots"></div>
+                </div>
+
+                <div class="trivia-actions">
+                    <button class="trivia-action-btn hint-btn" id="triviaHintBtn" title="Xem gợi ý">💡 Gợi ý</button>
+                    <button class="trivia-action-btn skip-btn" id="triviaSkipBtn" title="Bỏ qua câu này">⏭️ Bỏ qua</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: 3D Spiral -->
+    <div id="spiralTab" class="tab-content">
+        <div class="spiral-container">
+            <div class="spiral-header">
+                <h2 class="spiral-title">🌀 Bảng Tuần Hoàn 3D Xoắn Ốc</h2>
+                <p class="spiral-desc">Khám phá các nguyên tố theo dạng xoắn ốc 3D tương tác</p>
+            </div>
+
+            <div class="spiral-controls">
+                <div class="spiral-control-group">
+                    <label>Chế độ hiển thị:</label>
+                    <button class="spiral-btn active" data-view="helix">Xoắn Ốc</button>
+                    <button class="spiral-btn" data-view="tower">Tháp 3D</button>
+                    <button class="spiral-btn" data-view="galaxy">Thiên Hà</button>
+                </div>
+                <div class="spiral-control-group">
+                    <label>Tốc độ xoay:</label>
+                    <input type="range" id="rotationSpeed" min="0" max="100" value="30" class="spiral-slider">
+                </div>
+                <div class="spiral-control-group">
+                    <label>Zoom:</label>
+                    <input type="range" id="zoomLevel" min="20" max="100" value="60" class="spiral-slider">
+                </div>
+                <button class="spiral-reset-btn" id="resetSpiralView">🔄 Reset View</button>
+            </div>
+
+            <div class="spiral-legend">
+                <div class="spiral-legend-item" data-cat="alkali"><span class="leg-dot" style="background: #ff6b6b;"></span>Kim loại kiềm</div>
+                <div class="spiral-legend-item" data-cat="alkaline"><span class="leg-dot" style="background: #ffa94d;"></span>Kim loại kiềm thổ</div>
+                <div class="spiral-legend-item" data-cat="transition"><span class="leg-dot" style="background: #ffd43b;"></span>Kim loại chuyển tiếp</div>
+                <div class="spiral-legend-item" data-cat="post-transition"><span class="leg-dot" style="background: #69db7c;"></span>Kim loại yếu</div>
+                <div class="spiral-legend-item" data-cat="metalloid"><span class="leg-dot" style="background: #38d9a9;"></span>Á kim</div>
+                <div class="spiral-legend-item" data-cat="nonmetal"><span class="leg-dot" style="background: #4dabf7;"></span>Phi kim</div>
+                <div class="spiral-legend-item" data-cat="halogen"><span class="leg-dot" style="background: #748ffc;"></span>Halogen</div>
+                <div class="spiral-legend-item" data-cat="noble"><span class="leg-dot" style="background: #da77f2;"></span>Khí hiếm</div>
+                <div class="spiral-legend-item" data-cat="lanthanide"><span class="leg-dot" style="background: #f783ac;"></span>Lantanit</div>
+                <div class="spiral-legend-item" data-cat="actinide"><span class="leg-dot" style="background: #e599f7;"></span>Actinit</div>
+            </div>
+
+            <div class="spiral-3d-wrapper">
+                <div id="spiral3DCanvas"></div>
+                <div class="spiral-element-info" id="spiralElementInfo">
+                    <div class="info-symbol"></div>
+                    <div class="info-name"></div>
+                    <div class="info-details"></div>
+                </div>
+            </div>
+
+            <div class="spiral-instructions">
+                <span>🖱️ Kéo để xoay</span>
+                <span>🔍 Cuộn để zoom</span>
+                <span>👆 Click nguyên tố để xem chi tiết</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="elementModal">
@@ -1669,7 +3663,7 @@
             { number: 6, symbol: "C", name: "Carbon", nameVi: "Cacbon", mass: 12.01, category: "nonmetal", period: 2, group: 14, electronegativity: 2.55, state: "Rắn", year: "Cổ đại", config: "[He] 2s² 2p²", fact: "Cơ sở của sự sống, có thể tồn tại dưới nhiều dạng thù hình như kim cương, than chì." },
             { number: 7, symbol: "N", name: "Nitrogen", nameVi: "Nitơ", mass: 14.01, category: "nonmetal", period: 2, group: 15, electronegativity: 3.04, state: "Khí", year: "1772", config: "[He] 2s² 2p³", fact: "Chiếm 78% khí quyển Trái Đất, cần thiết cho protein và DNA." },
             { number: 8, symbol: "O", name: "Oxygen", nameVi: "Oxi", mass: 16.00, category: "nonmetal", period: 2, group: 16, electronegativity: 3.44, state: "Khí", year: "1774", config: "[He] 2s² 2p⁴", fact: "Nguyên tố thiết yếu cho hô hấp, chiếm 21% khí quyển Trái Đất." },
-            { number: 9, symbol: "F", name: "Fluorine", nameVi: "Flo", mass: 19.00, category: "halogen", period: 2, group: 17, electronegativity: 3.98, state: "Khí", year: "1886", config: "[He] 2s² 2p⁵", fact: "Nguyên tố có độ âm điện cao nhất, dùng trong kem đánh răng." },
+            { number: 9, symbol: "F", name: "Fluorine", nameVi: "Flo", mass: 19.00, category: "halogen", period: 2, group: 17, electronegativity: 3.98, state: "Khí", year: "1886", config: "[He] 2s² 2p⁵", fact: "Nguyên tố c�� độ âm điện cao nhất, dùng trong kem đánh răng." },
             { number: 10, symbol: "Ne", name: "Neon", nameVi: "Neon", mass: 20.18, category: "noble", period: 2, group: 18, electronegativity: null, state: "Khí", year: "1898", config: "[He] 2s² 2p⁶", fact: "Tạo ra ánh sáng đỏ-cam đặc trưng trong đèn neon." },
 
             // Period 3
@@ -1683,7 +3677,7 @@
             { number: 18, symbol: "Ar", name: "Argon", nameVi: "Argon", mass: 39.95, category: "noble", period: 3, group: 18, electronegativity: null, state: "Khí", year: "1894", config: "[Ne] 3s² 3p⁶", fact: "Khí trơ phổ biến nhất, dùng trong bóng đèn và hàn." },
 
             // Period 4
-            { number: 19, symbol: "K", name: "Potassium", nameVi: "Kali", mass: 39.10, category: "alkali", period: 4, group: 1, electronegativity: 0.82, state: "Rắn", year: "1807", config: "[Ar] 4s¹", fact: "Cần thiết cho hoạt động cơ và thần kinh, có trong chuối." },
+            { number: 19, symbol: "K", name: "Potassium", nameVi: "Kali", mass: 39.10, category: "alkali", period: 4, group: 1, electronegativity: 0.82, state: "Rắn", year: "1807", config: "[Ar] 4s¹", fact: "Cần thiết cho ho���t động cơ và thần kinh, có trong chuối." },
             { number: 20, symbol: "Ca", name: "Calcium", nameVi: "Canxi", mass: 40.08, category: "alkaline", period: 4, group: 2, electronegativity: 1.00, state: "Rắn", year: "1808", config: "[Ar] 4s²", fact: "Thành phần chính của xương và răng, có nhiều trong sữa." },
             { number: 21, symbol: "Sc", name: "Scandium", nameVi: "Scandi", mass: 44.96, category: "transition", period: 4, group: 3, electronegativity: 1.36, state: "Rắn", year: "1879", config: "[Ar] 3d¹ 4s²", fact: "Kim loại chuyển tiếp đầu tiên, dùng trong đèn hồ quang." },
             { number: 22, symbol: "Ti", name: "Titanium", nameVi: "Titan", mass: 47.87, category: "transition", period: 4, group: 4, electronegativity: 1.54, state: "Rắn", year: "1791", config: "[Ar] 3d² 4s²", fact: "Kim loại nhẹ, bền, dùng trong máy bay và cấy ghép y tế." },
@@ -1984,7 +3978,7 @@
             "Strontium": { ipa: "/ˈstrɒntiəm/", speak: "Strontium" },
             "Yttrium": { ipa: "/ˈɪtriəm/", speak: "Yttrium" },
             "Zirconium": { ipa: "/zɜːˈkəʊniəm/", speak: "Zirconium" },
-            "Niobium": { ipa: "/naɪˈəʊbiəm/", speak: "Niobium" },
+            "Niobium": { ipa: "/naɪˈəʊbi��m/", speak: "Niobium" },
             "Molybdenum": { ipa: "/məˈlɪbdənəm/", speak: "Molybdenum" },
             "Technetium": { ipa: "/tekˈniːʃiəm/", speak: "Technetium" },
             "Ruthenium": { ipa: "/ruːˈθiːniəm/", speak: "Ruthenium" },
@@ -2740,6 +4734,318 @@
             if (e.key === 'Escape') closeModal();
         });
 
+        // ==================== COMPARISON MODE ====================
+        const comparisonState = {
+            currentMode: 'none',
+            // Approximate atomic radii in picometers (pm) for main group elements
+            atomicRadii: {
+                1: 53, 2: 31, 3: 167, 4: 112, 5: 87, 6: 77, 7: 75, 8: 73, 9: 71, 10: 69,
+                11: 190, 12: 145, 13: 118, 14: 111, 15: 98, 16: 88, 17: 79, 18: 71,
+                19: 243, 20: 194, 21: 184, 22: 176, 23: 171, 24: 166, 25: 161, 26: 156,
+                27: 152, 28: 149, 29: 145, 30: 142, 31: 136, 32: 125, 33: 114, 34: 103,
+                35: 94, 36: 88, 37: 265, 38: 219, 39: 212, 40: 206, 41: 198, 42: 190,
+                43: 183, 44: 178, 45: 173, 46: 169, 47: 165, 48: 161, 49: 156, 50: 145,
+                51: 133, 52: 123, 53: 115, 54: 108, 55: 298, 56: 253, 57: 195, 72: 208,
+                73: 200, 74: 193, 75: 188, 76: 185, 77: 180, 78: 177, 79: 174, 80: 171,
+                81: 156, 82: 154, 83: 143, 84: 135, 85: 127, 86: 120, 87: 348, 88: 283,
+                89: 195, 104: 157, 105: 149, 106: 143, 107: 141, 108: 134, 109: 129,
+                110: 128, 111: 121, 112: 122, 113: 136, 114: 143, 115: 162, 116: 175,
+                117: 165, 118: 157
+            }
+        };
+
+        // Calculate metallic character (higher = more metallic)
+        function getMetallicCharacter(element) {
+            // Metallic character increases down a group and decreases across a period
+            // Formula: based on position (period increases, group 1 is most metallic)
+            const periodFactor = element.period * 15;
+            const groupFactor = (18 - element.group) * 5;
+
+            // Bonus for actual metals
+            const metalCategories = ['alkali', 'alkaline', 'transition', 'post-transition', 'lanthanide', 'actinide'];
+            const isMetalBonus = metalCategories.includes(element.category) ? 20 : 0;
+
+            return Math.min(100, periodFactor + groupFactor + isMetalBonus);
+        }
+
+        // Calculate non-metallic character (higher = more non-metallic)
+        function getNonMetallicCharacter(element) {
+            // Non-metallic character increases up a group and across a period
+            const periodFactor = (8 - element.period) * 12;
+            const groupFactor = element.group * 4;
+
+            // Bonus for actual non-metals
+            const nonMetalCategories = ['nonmetal', 'halogen', 'noble'];
+            const isNonMetalBonus = nonMetalCategories.includes(element.category) ? 25 : 0;
+
+            return Math.min(100, periodFactor + groupFactor + isNonMetalBonus);
+        }
+
+        // Get atomic radius for an element
+        function getAtomicRadius(element) {
+            return comparisonState.atomicRadii[element.number] || 150;
+        }
+
+        // Apply comparison mode to elements
+        function applyComparisonMode(mode) {
+            comparisonState.currentMode = mode;
+            const elementCards = document.querySelectorAll('.element');
+            const legendEl = document.getElementById('comparisonLegend');
+            const infoEl = document.getElementById('comparisonInfo');
+
+            // Reset all elements first
+            elementCards.forEach(card => {
+                card.classList.remove('compare-mode', 'radius-scale', 'electro-mode');
+                card.style.transform = '';
+                card.style.background = '';
+                card.style.boxShadow = '';
+
+                // Remove old indicators
+                const oldIndicator = card.querySelector('.radius-indicator');
+                if (oldIndicator) oldIndicator.remove();
+                const oldPulse = card.querySelector('.electro-pulse');
+                if (oldPulse) oldPulse.remove();
+                const oldValue = card.querySelector('.compare-value');
+                if (oldValue) oldValue.remove();
+            });
+
+            legendEl.innerHTML = '';
+            legendEl.classList.remove('visible');
+            infoEl.innerHTML = '';
+
+            // Hide trend arrows by default
+            var trendContainer = document.getElementById('trendArrowsContainer');
+            if (trendContainer) trendContainer.classList.remove('visible');
+
+            if (mode === 'none') return;
+
+            legendEl.classList.add('visible');
+
+            switch(mode) {
+                case 'radius':
+                    applyRadiusComparison(elementCards);
+                    legendEl.innerHTML = '<div class="comp-legend-item"><div>' +
+                        '<div class="comp-legend-bar" style="background: linear-gradient(90deg, #4ade80 0%, #fbbf24 50%, #ef4444 100%);"></div>' +
+                        '<div class="comp-legend-labels"><span>Nhỏ</span><span>Trung bình</span><span>Lớn</span></div>' +
+                        '</div></div>';
+                    infoEl.innerHTML = '<strong>Quy luật:</strong> Bán kính nguyên tử <strong>tăng</strong> từ phải sang trái trong chu kỳ và <strong>tăng</strong> từ trên xuống dưới trong nhóm.<br>' +
+                        '<em>Kích thước ô nguyên tố thể hiện tương đối bán kính của nguyên tử.</em>';
+                    break;
+
+                case 'electronegativity':
+                    applyElectronegativityComparison(elementCards);
+                    legendEl.innerHTML = '<div class="comp-legend-item"><div>' +
+                        '<div class="comp-legend-bar" style="background: linear-gradient(90deg, #1e3a5f 0%, #3b82f6 25%, #8b5cf6 50%, #ec4899 75%, #ff0080 100%);"></div>' +
+                        '<div class="comp-legend-labels"><span>Thấp (0.7)</span><span>TB</span><span>Cao (4.0)</span></div>' +
+                        '</div></div>';
+                    infoEl.innerHTML = '<strong>Quy luật:</strong> Độ âm điện <strong>tăng</strong> từ trái sang phải trong chu kỳ và <strong>tăng</strong> từ dưới lên trên trong nhóm.<br>' +
+                        '<em>Vùng sáng và pulse thể hiện sức mạnh hút electron.</em>';
+                    break;
+
+                case 'metallic-nonmetallic':
+                    applyMetallicNonMetallicComparison(elementCards);
+                    // Show trend arrows
+                    if (trendContainer) trendContainer.classList.add('visible');
+                    legendEl.innerHTML = '<div class="comp-legend-item"><div>' +
+                        '<div class="comp-legend-bar" style="background: linear-gradient(90deg, #ffd700 0%, #c0c0c0 30%, #6b7280 50%, #a78bfa 70%, #f472b6 100%);"></div>' +
+                        '<div class="comp-legend-labels"><span>🔩 Kim loại mạnh</span><span>Trung tính</span><span>���� Phi kim mạnh</span></div>' +
+                        '</div></div>';
+                    infoEl.innerHTML = '<strong>Màu vàng/bạc:</strong> Tính kim loại mạnh | <strong>Màu hồng/tím:</strong> Tính phi kim mạnh | <strong>Màu xám:</strong> Á kim/trung tính';
+                    break;
+            }
+        }
+
+        // Apply radius comparison
+        function applyRadiusComparison(elementCards) {
+            const maxRadius = 350;
+            const minRadius = 30;
+
+            elementCards.forEach(card => {
+                const elementNum = parseInt(card.dataset.number);
+                const element = elements.find(e => e.number === elementNum);
+                if (!element) return;
+
+                card.classList.add('compare-mode', 'radius-scale');
+
+                const radius = getAtomicRadius(element);
+                const normalizedRadius = (radius - minRadius) / (maxRadius - minRadius);
+                const scale = 0.6 + normalizedRadius * 0.6; // Scale from 0.6 to 1.2
+
+                // Color based on radius
+                const hue = (1 - normalizedRadius) * 120; // Green to Red
+                const color = `hsl(${hue}, 70%, 50%)`;
+
+                card.style.transform = `scale(${scale})`;
+                card.style.background = `linear-gradient(145deg, ${color}88, ${color}44)`;
+                card.style.borderColor = color;
+                card.style.zIndex = Math.floor(normalizedRadius * 10);
+
+                // Add value indicator
+                const valueEl = document.createElement('span');
+                valueEl.className = 'compare-value';
+                valueEl.textContent = `${radius}pm`;
+                card.appendChild(valueEl);
+            });
+        }
+
+        // Apply electronegativity comparison
+        function applyElectronegativityComparison(elementCards) {
+            const maxEN = 4.0;
+            const minEN = 0.7;
+
+            elementCards.forEach(card => {
+                const elementNum = parseInt(card.dataset.number);
+                const element = elements.find(e => e.number === elementNum);
+                if (!element || element.electronegativity === null) {
+                    card.style.opacity = '0.4';
+                    return;
+                }
+
+                card.classList.add('compare-mode', 'electro-mode');
+                card.style.opacity = '1';
+
+                const en = element.electronegativity;
+                const normalized = (en - minEN) / (maxEN - minEN);
+
+                // Color gradient from dark blue (low) to bright pink (high)
+                let color;
+                if (normalized < 0.25) {
+                    color = `rgb(30, 58, 95)`;
+                } else if (normalized < 0.5) {
+                    const t = (normalized - 0.25) * 4;
+                    color = `rgb(${30 + t * 89}, ${58 + t * 72}, ${95 + t * 151})`;
+                } else if (normalized < 0.75) {
+                    const t = (normalized - 0.5) * 4;
+                    color = `rgb(${119 + t * 117}, ${130 - t * 38}, ${246 - t * 93})`;
+                } else {
+                    const t = (normalized - 0.75) * 4;
+                    color = `rgb(${236 + t * 19}, ${92 - t * 92}, ${153 - t * 25})`;
+                }
+
+                card.style.background = `linear-gradient(145deg, ${color}, ${color}88)`;
+                card.style.borderColor = color;
+
+                // Add glow effect based on electronegativity
+                const glowIntensity = normalized * 30;
+                card.style.boxShadow = `0 0 ${glowIntensity}px ${color}, inset 0 0 ${glowIntensity/2}px rgba(255,255,255,0.2)`;
+
+                // Add pulse effect for high electronegativity
+                if (normalized > 0.6) {
+                    const pulse = document.createElement('div');
+                    pulse.className = 'electro-pulse';
+                    pulse.style.width = `${30 + normalized * 40}px`;
+                    pulse.style.height = `${30 + normalized * 40}px`;
+                    pulse.style.border = `2px solid ${color}`;
+                    pulse.style.animationDuration = `${2 - normalized}s`;
+                    card.appendChild(pulse);
+                }
+
+                // Add value indicator
+                const valueEl = document.createElement('span');
+                valueEl.className = 'compare-value';
+                valueEl.textContent = en.toFixed(2);
+                card.appendChild(valueEl);
+            });
+        }
+
+        // Apply combined metallic and non-metallic character comparison
+        function applyMetallicNonMetallicComparison(elementCards) {
+            elementCards.forEach(function(card) {
+                var elementNum = parseInt(card.dataset.number);
+                var element = elements.find(function(e) { return e.number === elementNum; });
+                if (!element) return;
+
+                card.classList.add('compare-mode');
+
+                var metallic = getMetallicCharacter(element);
+                var nonMetallic = getNonMetallicCharacter(element);
+
+                // Calculate which character is dominant
+                var metallicNorm = metallic / 100;
+                var nonMetallicNorm = nonMetallic / 100;
+                var balance = metallicNorm - nonMetallicNorm; // positive = metallic, negative = non-metallic
+
+                var color;
+                var glowColor;
+                var label;
+
+                if (balance > 0.3) {
+                    // Strong metallic character - Gold/Silver
+                    var intensity = Math.min(1, (balance - 0.3) / 0.7);
+                    var r = Math.round(192 + intensity * 63);
+                    var g = Math.round(169 + intensity * 46);
+                    var b = Math.round(100 - intensity * 50);
+                    color = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+                    glowColor = '#ffd700';
+                    label = '🔩 ' + Math.round(metallic) + '%';
+                } else if (balance > 0.1) {
+                    // Moderate metallic - Silver
+                    color = 'rgb(192, 192, 192)';
+                    glowColor = '#c0c0c0';
+                    label = '🔩 ' + Math.round(metallic) + '%';
+                } else if (balance > -0.1) {
+                    // Neutral/Metalloid - Gray with slight teal
+                    color = 'rgb(107, 142, 148)';
+                    glowColor = '#6b8e94';
+                    label = '⚖️';
+                } else if (balance > -0.3) {
+                    // Moderate non-metallic - Purple
+                    color = 'rgb(167, 139, 250)';
+                    glowColor = '#a78bfa';
+                    label = '💎 ' + Math.round(nonMetallic) + '%';
+                } else {
+                    // Strong non-metallic - Pink
+                    var intensity2 = Math.min(1, (-balance - 0.3) / 0.7);
+                    var r2 = Math.round(200 + intensity2 * 44);
+                    var g2 = Math.round(100 + intensity2 * 14);
+                    var b2 = Math.round(180 + intensity2 * 2);
+                    color = 'rgb(' + r2 + ', ' + g2 + ', ' + b2 + ')';
+                    glowColor = '#f472b6';
+                    label = '💎 ' + Math.round(nonMetallic) + '%';
+                }
+
+                card.style.background = 'linear-gradient(145deg, ' + color + ', ' + color + '88)';
+                card.style.borderColor = color;
+
+                // Add glow effect
+                var glowIntensity = Math.abs(balance) * 20 + 5;
+                card.style.boxShadow = '0 0 ' + glowIntensity + 'px ' + glowColor;
+
+                // Add metallic sheen for metals
+                if (balance > 0.2) {
+                    card.style.boxShadow = card.style.boxShadow + ', inset 0 -3px 8px rgba(255,255,255,0.3)';
+                }
+
+                // Add value indicator
+                var valueEl = document.createElement('span');
+                valueEl.className = 'compare-value';
+                valueEl.textContent = label;
+                valueEl.style.fontSize = '7px';
+                card.appendChild(valueEl);
+            });
+        }
+
+        // Initialize comparison controls
+        function initComparisonControls() {
+            const compareBtns = document.querySelectorAll('.compare-btn');
+
+            compareBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mode = btn.dataset.compare;
+
+                    // Toggle active state
+                    compareBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Apply comparison mode
+                    applyComparisonMode(mode);
+                });
+            });
+
+            // Set default active
+            document.querySelector('.compare-btn[data-compare="none"]')?.classList.add('active');
+        }
+
         // ==================== TAB NAVIGATION ====================
         function initTabs() {
             const tabBtns = document.querySelectorAll('.tab-btn');
@@ -2793,16 +5099,18 @@
                     return elements.filter(e => e.category === 'noble');
                 case 'random':
                 default:
-                    return [...elements].sort(() => Math.random() - 0.5).slice(0, 30);
+                    return elements.slice().sort(function() { return Math.random() - 0.5; }).slice(0, 30);
             }
         }
 
         // Shuffle array
         function shuffleArray(array) {
-            const shuffled = [...array];
+            const shuffled = array.slice();
             for (let i = shuffled.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                const temp = shuffled[i];
+                shuffled[i] = shuffled[j];
+                shuffled[j] = temp;
             }
             return shuffled;
         }
@@ -2903,7 +5211,7 @@
 
             // Flip the card
             cardEl.classList.add('flipped');
-            memoryGame.flippedCards.push({ index, card, element: cardEl });
+            memoryGame.flippedCards.push({ index: index, card: card, element: cardEl });
 
             // Check for match when 2 cards are flipped
             if (memoryGame.flippedCards.length === 2) {
@@ -2915,7 +5223,8 @@
 
         // Check for match
         function checkMemoryMatch() {
-            const [first, second] = memoryGame.flippedCards;
+            var first = memoryGame.flippedCards[0];
+            var second = memoryGame.flippedCards[1];
 
             if (first.card.id === second.card.id && first.card.type !== second.card.type) {
                 // Match found!
@@ -3066,27 +5375,27 @@
                     case 'symbol':
                         question = {
                             display: element.symbol,
-                            question: `Ký hiệu "${element.symbol}" là nguyên tố nào?`,
+                            question: 'Ký hiệu "' + element.symbol + '" là nguyên tố nào?',
                             answer: element.name,
-                            options: shuffleArray([element.name, ...wrongAnswers.map(e => e.name)]),
+                            options: shuffleArray([element.name].concat(wrongAnswers.map(function(e) { return e.name; }))),
                             element: element
                         };
                         break;
                     case 'name':
                         question = {
                             display: element.name,
-                            question: `Nguyên tố "${element.name}" có ký hiệu gì?`,
+                            question: 'Nguyên tố "' + element.name + '" có ký hiệu gì?',
                             answer: element.symbol,
-                            options: shuffleArray([element.symbol, ...wrongAnswers.map(e => e.symbol)]),
+                            options: shuffleArray([element.symbol].concat(wrongAnswers.map(function(e) { return e.symbol; }))),
                             element: element
                         };
                         break;
                     case 'config':
                         question = {
                             display: element.config,
-                            question: `Cấu hình electron này thuộc nguyên tố nào?`,
+                            question: 'Cấu hình electron này thuộc nguyên tố nào?',
                             answer: element.name,
-                            options: shuffleArray([element.name, ...wrongAnswers.map(e => e.name)]),
+                            options: shuffleArray([element.name].concat(wrongAnswers.map(function(e) { return e.name; }))),
                             element: element
                         };
                         break;
@@ -3299,15 +5608,1580 @@
             });
         }
 
+        // ==================== TRIVIA 50 QUESTIONS GAME ====================
+        const triviaGame = {
+            questions: [],
+            currentQuestion: 0,
+            totalQuestions: 50,
+            correct: 0,
+            wrong: 0,
+            skipped: 0,
+            score: 0,
+            difficulty: 'easy',
+            category: 'all',
+            isPlaying: false,
+            hintUsed: false,
+            questionResults: []
+        };
+
+        // 50 câu hỏi về nguyên tố hóa học
+        const triviaQuestionsBank = [
+            // === LỊCH SỬ & NGUỒN GỐC (History) ===
+            {
+                category: 'history',
+                difficulty: 'easy',
+                question: 'Tên "Oxygen" (Oxy) có nguồn gốc từ tiếng Hy Lạp, nghĩa là gì?',
+                options: ['Tạo ra axit', 'Không khí', 'Lửa', 'Nước'],
+                answer: 'Tạo ra axit',
+                hint: 'Lavoisier tin rằng nguyên tố này là thành phần thiết yếu của tất cả các axit',
+                explanation: '"Oxygen" xuất phát từ tiếng Hy Lạp "oxys" (axit) và "genes" (tạo ra). Lavoisier đặt tên này vì ông tin rằng oxy là thành phần của tất cả các axit (dù điều này không hoàn toàn đúng).'
+            },
+            {
+                category: 'history',
+                difficulty: 'easy',
+                question: 'Nguyên tố Helium (He) được phát hiện lần đầu ở đâu?',
+                options: ['Trong nước biển', 'Trên Mặt Trời', 'Trong không khí', 'Trong đất'],
+                answer: 'Trên Mặt Trời',
+                hint: 'Tên của nó xuất phát từ thần Mặt Trời Hy Lạp - Helios',
+                explanation: 'Helium được phát hiện năm 1868 khi phân tích quang phổ của Mặt Trời trong nhật thực. Tên "Helium" xuất phát từ "Helios" - thần Mặt Trời trong thần thoại Hy Lạp.'
+            },
+            {
+                category: 'history',
+                difficulty: 'medium',
+                question: 'Ai là người đầu tiên tổng hợp thành công nguyên tố Plutonium (Pu)?',
+                options: ['Marie Curie', 'Glenn T. Seaborg', 'Ernest Rutherford', 'Niels Bohr'],
+                answer: 'Glenn T. Seaborg',
+                hint: 'Ông nhận giải Nobel Hóa học năm 1951',
+                explanation: 'Glenn T. Seaborg và nhóm của ông tổng hợp Plutonium năm 1940-1941 tại Đại học California, Berkeley. Ông nhận giải Nobel Hóa học 1951 cho công trình về các nguyên tố siêu uranium.'
+            },
+            {
+                category: 'history',
+                difficulty: 'medium',
+                question: 'Nguyên tố nào được đặt tên theo hành tinh Uranus?',
+                options: ['Uranium', 'Neptunium', 'Plutonium', 'Americium'],
+                answer: 'Uranium',
+                hint: 'Được phát hiện năm 1789, chỉ 8 năm sau khi hành tinh này được khám phá',
+                explanation: 'Uranium được Martin Klaproth phát hiện năm 1789 và đặt tên theo hành tinh Uranus (được William Herschel phát hiện năm 1781). Neptunium và Plutonium cũng được đặt tên theo các hành tinh tương ứng.'
+            },
+            {
+                category: 'history',
+                difficulty: 'hard',
+                question: 'Nguyên tố Technetium (Tc) có điều gì đặc biệt trong lịch sử hóa học?',
+                options: ['Nguyên tố nhân tạo đầu tiên', 'Nguyên tố phóng xạ đầu tiên', 'Nguyên tố khí hiếm đầu tiên', 'Nguyên tố kim loại đầu tiên'],
+                answer: 'Nguyên tố nhân tạo đầu tiên',
+                hint: 'Tên của nó xuất phát từ tiếng Hy Lạp "technetos" nghĩa là "nhân tạo"',
+                explanation: 'Technetium (Z=43) là nguyên tố đầu tiên được tổng hợp nhân tạo (1937). Tất cả các đồng vị của nó đều phóng xạ, không tồn tại tự nhiên trên Trái Đất. Tên từ "technetos" (Hy Lạp) = nhân tạo.'
+            },
+            {
+                category: 'history',
+                difficulty: 'easy',
+                question: 'Nguyên tố Argentum (Ag) là tên Latin của kim loại nào?',
+                options: ['Gold', 'Silver', 'Copper', 'Iron'],
+                answer: 'Silver',
+                hint: 'Argentina được đặt tên theo nguyên tố này',
+                explanation: 'Argentum là tên Latin của Silver (Bạc), ký hiệu Ag. Quốc gia Argentina được đặt tên theo nguyên tố này vì người Tây Ban Nha tin rằng có nhiều bạc ở vùng đất này.'
+            },
+            {
+                category: 'history',
+                difficulty: 'medium',
+                question: 'Marie Curie phát hiện ra hai nguyên tố nào?',
+                options: ['Radium và Polonium', 'Uranium và Thorium', 'Francium và Actinium', 'Radon và Radium'],
+                answer: 'Radium và Polonium',
+                hint: 'Một trong hai nguyên tố được đặt tên theo quê hương của bà',
+                explanation: 'Marie Curie phát hiện Polonium (đặt tên theo Ba Lan - quê hương bà) và Radium năm 1898. Bà nhận 2 giải Nobel: Vật lý (1903) và Hóa học (1911).'
+            },
+            {
+                category: 'history',
+                difficulty: 'hard',
+                question: 'Nguyên tố Gallium (Ga) được phát hiện theo cách nào đặc biệt?',
+                options: ['Mendeleev dự đoán trước khi phát hiện', 'Tìm thấy trong thiên thạch', 'Sản phẩm phụ của vũ khí hạt nhân', 'Phát hiện trong cơ thể người'],
+                answer: 'Mendeleev dự đoán trước khi phát hiện',
+                hint: 'Mendeleev gọi nó là "eka-aluminum" trong bảng tuần hoàn',
+                explanation: 'Năm 1871, Mendeleev dự đoán tính chất của một nguyên tố chưa biết gọi là "eka-aluminum". Năm 1875, Paul Émile Lecoq de Boisbaudran phát hiện Gallium với tính chất gần đúng như dự đoán, chứng minh tính đúng đắn của bảng tuần hoàn.'
+            },
+            {
+                category: 'history',
+                difficulty: 'medium',
+                question: 'Nguyên tố nào được đặt tên theo thần chiến tranh La Mã?',
+                options: ['Iron', 'Mars (không tồn tại)', 'Titanium', 'Cobalt'],
+                answer: 'Titanium',
+                hint: 'Thực ra Titanium được đặt tên theo Titan trong thần thoại Hy Lạp',
+                explanation: 'Đây là câu hỏi bẫy! Không có nguyên tố nào đặt tên theo Mars (thần chiến tranh). Titanium được đặt tên theo Titan (thần thoại Hy Lạp). Tuy nhiên, hành tinh Sao Hỏa (Mars) có màu đỏ do oxide sắt.'
+            },
+            {
+                category: 'history',
+                difficulty: 'hard',
+                question: 'Nguyên tố Einsteinium (Es) được tạo ra trong sự kiện lịch sử nào?',
+                options: ['Vụ nổ bom nguyên tử đầu tiên', 'Vụ thử bom hydro Ivy Mike', 'Thảm họa Chernobyl', 'Thí nghiệm CERN'],
+                answer: 'Vụ thử bom hydro Ivy Mike',
+                hint: 'Sự kiện này xảy ra năm 1952 tại Thái Bình Dương',
+                explanation: 'Einsteinium được phát hiện trong bụi phóng xạ từ vụ thử bom hydro "Ivy Mike" năm 1952 tại đảo san hô Enewetak. Được đặt tên theo Albert Einstein và công bố năm 1955.'
+            },
+
+            // === TÍNH CHẤT VẬT LÝ (Physical) ===
+            {
+                category: 'physical',
+                difficulty: 'easy',
+                question: 'Kim loại nào có khả năng dẫn điện tốt nhất?',
+                options: ['Gold', 'Silver', 'Copper', 'Aluminium'],
+                answer: 'Silver',
+                hint: 'Đây là kim loại quý được dùng nhiều trong trang sức',
+                explanation: 'Silver (Ag) có độ dẫn điện cao nhất trong tất cả kim loại. Tuy nhiên, Copper thường được dùng phổ biến hơn vì rẻ hơn nhiều. Thứ tự: Ag > Cu > Au > Al.'
+            },
+            {
+                category: 'physical',
+                difficulty: 'easy',
+                question: 'Nguyên tố nào là chất khí nhẹ nhất trong vũ trụ?',
+                options: ['Helium', 'Hydrogen', 'Nitrogen', 'Oxygen'],
+                answer: 'Hydrogen',
+                hint: 'Nguyên tố đầu tiên trong bảng tuần hoàn',
+                explanation: 'Hydrogen (H) là nguyên tố nhẹ nhất với khối lượng nguyên tử khoảng 1 u. Nó cũng là nguyên tố phổ biến nhất trong vũ trụ, chiếm khoảng 75% khối lượng vật chất thông thường.'
+            },
+            {
+                category: 'physical',
+                difficulty: 'medium',
+                question: 'Kim loại nào có điểm nóng chảy cao nhất?',
+                options: ['Iron', 'Tungsten', 'Titanium', 'Platinum'],
+                answer: 'Tungsten',
+                hint: 'Kim loại này được dùng làm dây tóc bóng đèn',
+                explanation: 'Tungsten (W) có điểm nóng chảy 3422°C - cao nhất trong các kim loại. Vì vậy nó được dùng làm dây tóc bóng đèn sợi đốt và các ứng dụng chịu nhiệt cao.'
+            },
+            {
+                category: 'physical',
+                difficulty: 'medium',
+                question: 'Nguyên tố phi kim nào tồn tại ở dạng lỏng ở nhiệt độ phòng?',
+                options: ['Chlorine', 'Bromine', 'Iodine', 'Fluorine'],
+                answer: 'Bromine',
+                hint: 'Đây là halogen duy nhất ở trạng thái này',
+                explanation: 'Bromine (Br) là một trong hai nguyên tố tồn tại ở dạng lỏng ở nhiệt độ phòng (cùng với Mercury). Nó có màu nâu đỏ và có mùi hăng đặc trưng.'
+            },
+            {
+                category: 'physical',
+                difficulty: 'hard',
+                question: 'Kim loại nào có mật độ thấp nhất?',
+                options: ['Sodium', 'Lithium', 'Potassium', 'Magnesium'],
+                answer: 'Lithium',
+                hint: 'Kim loại này có thể nổi trên dầu',
+                explanation: 'Lithium (Li) có mật độ chỉ 0.534 g/cm³ - nhẹ nhất trong các kim loại. Nó có thể nổi trên dầu (nhưng phản ứng mạnh với nước nên không thể nổi trên nước an toàn).'
+            },
+            {
+                category: 'physical',
+                difficulty: 'easy',
+                question: 'Nguyên tố kim loại nào mềm đến mức có thể cắt bằng dao?',
+                options: ['Aluminium', 'Sodium', 'Iron', 'Copper'],
+                answer: 'Sodium',
+                hint: 'Kim loại kiềm này phản ứng mạnh với nước',
+                explanation: 'Sodium (Na) và các kim loại kiềm khác rất mềm, có thể cắt bằng dao. Khi cắt, bề mặt sáng bóng nhưng nhanh chóng bị oxy hóa thành màu xám trong không khí.'
+            },
+            {
+                category: 'physical',
+                difficulty: 'medium',
+                question: 'Nguyên tố nào có độ âm điện cao nhất?',
+                options: ['Oxygen', 'Fluorine', 'Chlorine', 'Nitrogen'],
+                answer: 'Fluorine',
+                hint: 'Đây là halogen đầu tiên trong nhóm VIIA',
+                explanation: 'Fluorine (F) có độ âm điện cao nhất (3.98 theo thang Pauling). Điều này khiến nó là nguyên tố phản ứng mạnh nhất, có thể phản ứng với hầu hết các nguyên tố khác.'
+            },
+            {
+                category: 'physical',
+                difficulty: 'hard',
+                question: 'Kim loại nào có tính dẻo (ductility) cao nhất - có thể kéo thành sợi dài nhất?',
+                options: ['Silver', 'Gold', 'Copper', 'Platinum'],
+                answer: 'Gold',
+                hint: '1 gram kim loại này có thể kéo thành sợi dài hơn 2 km',
+                explanation: 'Gold (Au) có tính dẻo cao nhất. 1 gram Gold có thể kéo thành sợi dài hơn 2 km! Gold cũng có tính dát mỏng cao nhất - có thể dát thành lá mỏng chỉ vài nguyên tử.'
+            },
+            {
+                category: 'physical',
+                difficulty: 'medium',
+                question: 'Nguyên tố nào có nhiệt độ sôi thấp nhất?',
+                options: ['Hydrogen', 'Helium', 'Nitrogen', 'Oxygen'],
+                answer: 'Helium',
+                hint: 'Khí này được dùng trong nghiên cứu nhiệt độ cực thấp',
+                explanation: 'Helium có nhiệt độ sôi thấp nhất: -268.93°C (4.22 K). Nó là chất duy nhất không thể đông đặc ở áp suất thường, cần áp suất rất cao để đông đặc.'
+            },
+            {
+                category: 'physical',
+                difficulty: 'hard',
+                question: 'Nguyên tố nào có khả năng hấp thụ neutron tốt nhất, thường dùng trong thanh điều khiển lò phản ứng hạt nhân?',
+                options: ['Boron', 'Carbon', 'Nitrogen', 'Uranium'],
+                answer: 'Boron',
+                hint: 'Nguyên tố này có số hiệu nguyên tử là 5',
+                explanation: 'Boron (B), đặc biệt là đồng vị B-10, có khả năng hấp thụ neutron rất cao. Nó được dùng trong thanh điều khiển lò phản ứng hạt nhân và tấm chắn neutron.'
+            },
+
+            // === TÍNH CHẤT HÓA HỌC (Chemical) ===
+            {
+                category: 'chemical',
+                difficulty: 'easy',
+                question: 'Khi đốt cháy Sodium (Na) trong không khí, ngọn lửa có màu gì?',
+                options: ['Red', 'Green', 'Yellow', 'Purple'],
+                answer: 'Yellow',
+                hint: 'Màu này thường thấy trong đèn đường sodium',
+                explanation: 'Sodium cháy với ngọn lửa màu vàng (yellow) đặc trưng. Đây là cơ sở của thử nghiệm ngọn lửa để nhận biết Na. Đèn sodium phát ánh sáng vàng đơn sắc rất hiệu quả.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'easy',
+                question: 'Nguyên tố nào phản ứng mạnh với nước tạo ra khí hydrogen và có thể bốc cháy?',
+                options: ['Iron', 'Copper', 'Potassium', 'Aluminium'],
+                answer: 'Potassium',
+                hint: 'Kim loại kiềm thuộc nhóm IA',
+                explanation: 'Potassium (K) phản ứng rất mạnh với nước: 2K + 2H₂O → 2KOH + H₂. Phản ứng tỏa nhiều nhiệt đến mức khí H₂ sinh ra bốc cháy với ngọn lửa màu tím đặc trưng của K.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'medium',
+                question: 'Nguyên tố nào không phản ứng với acid HCl loãng ở điều kiện thường?',
+                options: ['Zinc', 'Iron', 'Copper', 'Magnesium'],
+                answer: 'Copper',
+                hint: 'Kim loại này đứng sau Hydrogen trong dãy hoạt động hóa học',
+                explanation: 'Copper (Cu) đứng sau H trong dãy hoạt động hóa học nên không phản ứng với acid HCl loãng. Cần acid có tính oxy hóa mạnh như HNO₃ hoặc H₂SO₄ đặc nóng để hòa tan Cu.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'medium',
+                question: 'Khí nào được tạo ra khi cho đá vôi (CaCO₃) tác dụng với acid?',
+                options: ['Oxygen', 'Hydrogen', 'Carbon dioxide', 'Nitrogen'],
+                answer: 'Carbon dioxide',
+                hint: 'Khí này làm đục nước vôi trong',
+                explanation: 'CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂↑. Khí CO₂ sinh ra có thể nhận biết bằng cách dẫn qua nước vôi trong Ca(OH)₂, tạo kết tủa trắng CaCO₃.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'hard',
+                question: 'Nguyên tố nào có nhiều trạng thái oxy hóa nhất trong các hợp chất của nó?',
+                options: ['Sulfur', 'Manganese', 'Iron', 'Nitrogen'],
+                answer: 'Manganese',
+                hint: 'Nguyên tố này có thể có trạng thái oxy hóa từ -3 đến +7',
+                explanation: 'Manganese (Mn) có thể có các trạng thái oxy hóa từ -3 đến +7, phổ biến nhất là +2, +4, +7. KMnO₄ (Mn⁺⁷) là chất oxy hóa mạnh, MnO₂ (Mn⁺⁴) dùng trong pin.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'easy',
+                question: 'Hợp chất Fe₂O₃ có màu gì?',
+                options: ['Trắng', 'Đen', 'Đỏ nâu', 'Xanh'],
+                answer: 'Đỏ nâu',
+                hint: 'Đây là thành phần chính của gỉ sắt',
+                explanation: 'Fe₂O₃ (oxit sắt III) có màu đỏ nâu, là thành phần chính của gỉ sắt. Nó còn được gọi là hematit, được dùng làm chất màu (son môi đỏ), bột đánh bóng kim loại.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'medium',
+                question: 'Nguyên tố halogen nào phản ứng mãnh liệt nhất?',
+                options: ['Chlorine', 'Bromine', 'Fluorine', 'Iodine'],
+                answer: 'Fluorine',
+                hint: 'Nguyên tố đầu tiên trong nhóm halogen',
+                explanation: 'Fluorine (F₂) là halogen phản ứng mạnh nhất. Nó có thể phản ứng với hầu hết các nguyên tố, kể cả khí hiếm Xenon. Phản ứng thường xảy ra ngay ở nhiệt độ thường và tỏa nhiều nhiệt.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'hard',
+                question: 'Hiện tượng thù hình là gì?',
+                options: ['Một nguyên tố tồn tại ở nhiều dạng đơn chất khác nhau', 'Nguyên tố có nhiều đồng vị', 'Nguyên tố phóng xạ', 'Nguyên tố có nhiều trạng thái oxy hóa'],
+                answer: 'Một nguyên tố tồn tại ở nhiều dạng đơn chất khác nhau',
+                hint: 'Kim cương và than chì là ví dụ',
+                explanation: 'Thù hình là hiện tượng một nguyên tố tồn tại ở nhiều dạng đơn chất khác nhau. Ví dụ: Carbon có kim cương, than chì, fullerene; Oxygen có O₂ và O₃ (ozone); Sulfur có nhiều dạng tinh thể.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'medium',
+                question: 'Ion nào tạo màu xanh lam đặc trưng trong dung dịch?',
+                options: ['Fe²⁺', 'Cu²⁺', 'Zn²⁺', 'Ag⁺'],
+                answer: 'Cu²⁺',
+                hint: 'Dung dịch CuSO₄ có màu này',
+                explanation: 'Ion Cu²⁺ tạo màu xanh lam đặc trưng trong dung dịch. CuSO₄.5H₂O (đồng sunfat ngậm nước) có màu xanh đẹp, được dùng trong phòng thí nghiệm và nông nghiệp.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'hard',
+                question: 'Phản ứng nhiệt nhôm (thermite reaction) sử dụng nhôm để khử oxide của kim loại nào?',
+                options: ['Copper', 'Iron', 'Zinc', 'Lead'],
+                answer: 'Iron',
+                hint: 'Phản ứng này tạo ra nhiệt độ rất cao, dùng để hàn đường ray',
+                explanation: '2Al + Fe₂O₃ → Al₂O₃ + 2Fe + nhiệt. Phản ứng thermite tỏa nhiệt rất lớn (khoảng 2500°C), đủ để làm nóng chảy sắt. Được dùng để hàn đường ray xe lửa tại chỗ.'
+            },
+
+            // === ỨNG DỤNG (Application) ===
+            {
+                category: 'application',
+                difficulty: 'easy',
+                question: 'Nguyên tố nào được dùng phổ biến trong bóng đèn huỳnh quang?',
+                options: ['Argon', 'Neon', 'Mercury', 'Helium'],
+                answer: 'Mercury',
+                hint: 'Nguyên tố kim loại lỏng duy nhất ở nhiệt độ phòng',
+                explanation: 'Thủy ngân (Mercury/Hg) được dùng trong đèn huỳnh quang. Khi điện đi qua, hơi Hg phát ra tia UV, kích thích lớp phosphor trên thành ống phát sáng trắng.'
+            },
+            {
+                category: 'application',
+                difficulty: 'easy',
+                question: 'Khí nào được bơm vào bóng bay để bay lên?',
+                options: ['Oxygen', 'Nitrogen', 'Helium', 'Carbon dioxide'],
+                answer: 'Helium',
+                hint: 'Khí hiếm nhẹ hơn không khí và an toàn',
+                explanation: 'Helium được dùng bơm bóng bay vì nhẹ hơn không khí (mật độ 0.164 g/L so với không khí 1.225 g/L) và không cháy như Hydrogen, nên an toàn hơn.'
+            },
+            {
+                category: 'application',
+                difficulty: 'medium',
+                question: 'Nguyên tố nào được dùng trong pin Lithium-ion của điện thoại?',
+                options: ['Sodium', 'Lithium', 'Potassium', 'Calcium'],
+                answer: 'Lithium',
+                hint: 'Kim loại nhẹ nhất',
+                explanation: 'Lithium (Li) được dùng trong pin Li-ion vì có thế điện cực thấp nhất (-3.04V) và khối lượng nguyên tử nhỏ, giúp pin có mật độ năng lượng cao và nhẹ.'
+            },
+            {
+                category: 'application',
+                difficulty: 'medium',
+                question: 'Silicon được ứng dụng chủ yếu trong lĩnh vực nào?',
+                options: ['Công nghiệp thực phẩm', 'Công nghệ bán dẫn', 'Y tế', 'Xây dựng'],
+                answer: 'Công nghệ bán dẫn',
+                hint: 'Thung lũng Silicon (Silicon Valley) được đặt tên theo ứng dụng này',
+                explanation: 'Silicon là vật liệu bán dẫn chủ yếu trong chip máy tính, pin mặt trời. Silicon tinh khiết được "pha tạp" để tạo bán dẫn loại n và p, cơ sở của transistor.'
+            },
+            {
+                category: 'application',
+                difficulty: 'hard',
+                question: 'Nguyên tố nào được dùng trong đầu dò khói (smoke detector)?',
+                options: ['Radon', 'Americium', 'Plutonium', 'Uranium'],
+                answer: 'Americium',
+                hint: 'Đây là nguyên tố siêu uranium nhân tạo',
+                explanation: 'Americium-241 được dùng trong đầu dò khói ion hóa. Nó phát ra hạt alpha ion hóa không khí. Khi khói vào, dòng ion bị gián đoạn, kích hoạt báo động.'
+            },
+            {
+                category: 'application',
+                difficulty: 'easy',
+                question: 'Nguyên tố nào là thành phần chính của phân bón NPK?',
+                options: ['Nitrogen, Phosphorus, Potassium', 'Nitrogen, Platinum, Krypton', 'Nickel, Palladium, Potassium', 'Sodium, Phosphorus, Potassium'],
+                answer: 'Nitrogen, Phosphorus, Potassium',
+                hint: 'N, P, K là ký hiệu hóa học của 3 nguyên tố',
+                explanation: 'NPK là Nitrogen (N), Phosphorus (P), Potassium (K-Kalium). Đây là 3 nguyên tố dinh dưỡng ��a lượng thiết yếu cho cây trồng.'
+            },
+            {
+                category: 'application',
+                difficulty: 'medium',
+                question: 'Nguyên tố Xenon được ứng dụng trong lĩnh vực nào?',
+                options: ['Đèn pha xe hơi', 'Bảo quản thực phẩm', 'Sản xuất phân bón', 'Làm chất tẩy rửa'],
+                answer: 'Đèn pha xe hơi',
+                hint: 'Loại đèn này phát ra ánh sáng rất trắng và sáng',
+                explanation: 'Đèn Xenon (HID - High Intensity Discharge) phát ánh sáng trắng xanh rất sáng, hiệu quả hơn đèn halogen. Xenon cũng dùng trong đèn flash, đèn chiếu phim.'
+            },
+            {
+                category: 'application',
+                difficulty: 'hard',
+                question: 'Nguyên tố Technetium-99m được sử dụng trong lĩnh vực nào?',
+                options: ['Sản xuất điện hạt nhân', 'Chẩn đoán hình ảnh y tế', 'Chế tạo vũ khí', 'Xử lý nước thải'],
+                answer: 'Chẩn đoán hình ảnh y tế',
+                hint: 'Đây là đồng vị phóng xạ được dùng nhiều nhất trong y học',
+                explanation: 'Tc-99m là đồng vị phóng xạ dùng nhiều nhất trong y học hạt nhân (80% các thủ thuật). Nó phát tia gamma để chụp hình các cơ quan, có thời gian bán rã ngắn (6h) nên an toàn cho bệnh nhân.'
+            },
+            {
+                category: 'application',
+                difficulty: 'medium',
+                question: 'Titan (Titanium) được dùng nhiều trong ngành nào nhờ tính chất nhẹ và bền?',
+                options: ['Công nghiệp thực phẩm', 'Hàng không vũ trụ', 'Dệt may', 'Nông nghiệp'],
+                answer: 'Hàng không vũ trụ',
+                hint: 'Ngành này cần vật liệu nhẹ nhưng cực kỳ bền',
+                explanation: 'Titanium có tỷ lệ độ bền/khối lượng cao, chống ăn mòn tốt, chịu nhiệt cao. Được dùng trong khung máy bay, động cơ phản lực, tàu vũ trụ, và cả implant y tế.'
+            },
+            {
+                category: 'application',
+                difficulty: 'hard',
+                question: 'Nguyên tố nào được dùng trong detector của máy đếm Geiger-Müller?',
+                options: ['Helium', 'Argon', 'Xenon', 'Krypton'],
+                answer: 'Argon',
+                hint: 'Khí hiếm phổ biến và rẻ nhất',
+                explanation: 'Máy đếm Geiger-Müller thường chứa hỗn hợp Argon và một ít khí hữu cơ hoặc halogen. Khi tia phóng xạ đi qua, nó ion hóa Ar tạo xung điện đếm được.'
+            },
+
+            // === PHÁT HIỆN & NHÀ KHOA HỌC (Discovery) ===
+            {
+                category: 'discovery',
+                difficulty: 'easy',
+                question: 'Ai là người phát triển bảng tuần hoàn các nguyên tố hóa học?',
+                options: ['Albert Einstein', 'Dmitri Mendeleev', 'Marie Curie', 'Isaac Newton'],
+                answer: 'Dmitri Mendeleev',
+                hint: 'Nhà hóa học người Nga thế kỷ 19',
+                explanation: 'Dmitri Mendeleev công bố bảng tuần hoàn năm 1869, sắp xếp các nguyên tố theo khối lượng nguyên tử tăng dần và tính chất hóa học tuần hoàn. Ông còn dự đoán được các nguyên tố chưa biết.'
+            },
+            {
+                category: 'discovery',
+                difficulty: 'easy',
+                question: 'Nguyên tố Curium (Cm) được đặt tên theo ai?',
+                options: ['Marie Curie và Pierre Curie', 'Albert Einstein', 'Niels Bohr', 'Ernest Rutherford'],
+                answer: 'Marie Curie và Pierre Curie',
+                hint: 'Cặp vợ chồng nhà khoa học nổi tiếng về phóng xạ',
+                explanation: 'Curium (Cm, Z=96) được đặt tên theo Marie và Pierre Curie, những người tiên phong nghiên cứu phóng xạ. Marie Curie là người phụ nữ đầu tiên nhận giải Nobel và duy nhất nhận 2 giải Nobel ở 2 lĩnh vực khác nhau.'
+            },
+            {
+                category: 'discovery',
+                difficulty: 'medium',
+                question: 'Henry Cavendish nổi tiếng với việc phát hiện và nghiên cứu nguyên tố nào?',
+                options: ['Oxygen', 'Hydrogen', 'Nitrogen', 'Chlorine'],
+                answer: 'Hydrogen',
+                hint: 'Ông gọi nó là "không khí dễ cháy"',
+                explanation: 'Henry Cavendish phát hiện Hydrogen năm 1766, gọi nó là "inflammable air" (không khí dễ cháy). Ông cũng xác định thành phần của nước là H và O, và phát hiện Argon trong không khí.'
+            },
+            {
+                category: 'discovery',
+                difficulty: 'medium',
+                question: 'Nguyên tố nào được đặt tên theo nhà vật lý Niels Bohr?',
+                options: ['Bohrium', 'Boron', 'Berkelium', 'Bromine'],
+                answer: 'Bohrium',
+                hint: 'Nguyên tố siêu nặng có số hiệu 107',
+                explanation: 'Bohrium (Bh, Z=107) được đặt tên theo Niels Bohr - nhà vật lý Đan Mạch, người đề xuất mô hình nguyên tử Bohr và nhận giải Nobel Vật lý 1922.'
+            },
+            {
+                category: 'discovery',
+                difficulty: 'hard',
+                question: 'Ai là người đầu tiên cô lập được nguyên tố Fluorine?',
+                options: ['Antoine Lavoisier', 'Henri Moissan', 'Humphry Davy', 'Carl Wilhelm Scheele'],
+                answer: 'Henri Moissan',
+                hint: 'Nhà hóa học Pháp nhận Nobel năm 1906',
+                explanation: 'Henri Moissan cô lập được Fluorine năm 1886 bằng điện phân KF trong HF. Nhiều nhà khoa học trước đó đã bị thương hoặc tử vong khi cố gắng cô lập nguyên tố phản ứng mạnh này.'
+            },
+            {
+                category: 'discovery',
+                difficulty: 'easy',
+                question: 'Nguyên tố Mendelevium (Md) được đặt tên theo ai?',
+                options: ['Marie Curie', 'Dmitri Mendeleev', 'Albert Einstein', 'Ernest Rutherford'],
+                answer: 'Dmitri Mendeleev',
+                hint: 'Cha đẻ của bảng tuần hoàn',
+                explanation: 'Mendelevium (Md, Z=101) được đặt tên theo Dmitri Mendeleev để vinh danh công lao của ông trong việc phát triển bảng tuần hoàn các nguyên tố hóa học.'
+            },
+            {
+                category: 'discovery',
+                difficulty: 'medium',
+                question: 'Nguyên tố nào được William Ramsay phát hiện trong không khí?',
+                options: ['Oxygen', 'Nitrogen', 'Argon', 'Carbon dioxide'],
+                answer: 'Argon',
+                hint: 'Tên của nó có nghĩa là "lười biếng" trong tiếng Hy Lạp',
+                explanation: 'William Ramsay và Lord Rayleigh phát hiện Argon năm 1894. Tên "Argon" từ tiếng Hy Lạp "argos" = lười biếng, vì nó không phản ứng với các nguyên tố khác.'
+            },
+            {
+                category: 'discovery',
+                difficulty: 'hard',
+                question: 'Nguyên tố Seaborgium (Sg) được đặt tên khi người được vinh danh còn sống. Đây là trường hợp đặc biệt vì thường nguyên tố chỉ được đặt tên theo người đã mất. Ai là người đó?',
+                options: ['Glenn T. Seaborg', 'Niels Bohr', 'Ernest Rutherford', 'Lise Meitner'],
+                answer: 'Glenn T. Seaborg',
+                hint: 'Ông tổng hợp được nhiều nguyên tố siêu uranium',
+                explanation: 'Glenn T. Seaborg là một trong số ít người được đặt tên nguyên tố khi còn sống (Seaborgium, Sg, Z=106). Ông tham gia tổng hợp 10 nguyên tố siêu uranium và nhận Nobel Hóa học 1951.'
+            },
+            {
+                category: 'discovery',
+                difficulty: 'medium',
+                question: 'Ernest Rutherford phát hiện ra loại hạt nào trong hạt nhân nguyên tử?',
+                options: ['Electron', 'Proton', 'Neutron', 'Positron'],
+                answer: 'Proton',
+                hint: 'Hạt mang điện dương trong hạt nhân',
+                explanation: 'Ernest Rutherford phát hiện proton năm 1917 qua thí nghiệm bắn phá nitrogen bằng hạt alpha. Ông cũng đề xuất mô hình hạt nhân nguyên tử qua thí nghiệm lá vàng nổi tiếng.'
+            },
+            {
+                category: 'discovery',
+                difficulty: 'hard',
+                question: 'Nguyên tố Oganesson (Og, Z=118) được đặt tên theo nhà khoa học nào?',
+                options: ['Yuri Oganessian', 'Dmitri Mendeleev', 'Glenn Seaborg', 'Marie Curie'],
+                answer: 'Yuri Oganessian',
+                hint: 'Nhà vật lý hạt nhân người Nga-Armenia còn sống',
+                explanation: 'Oganesson được đặt tên theo Yuri Oganessian - nhà vật lý hạt nhân người Nga gốc Armenia. Ông là người thứ hai còn sống được đặt tên nguyên tố, sau Seaborg. Ông đóng góp lớn trong tổng hợp các nguyên tố siêu nặng.'
+            },
+
+            // === Thêm câu hỏi bổ sung để đủ 50 ===
+            {
+                category: 'physical',
+                difficulty: 'easy',
+                question: 'Ở điều kiện thường, kim loại duy nhất tồn tại ở dạng lỏng là gì?',
+                options: ['Gallium', 'Mercury', 'Cesium', 'Sodium'],
+                answer: 'Mercury',
+                hint: 'Kim loại này còn được gọi là thủy ngân',
+                explanation: 'Mercury (Hg) là kim loại duy nhất ở dạng lỏng ở nhiệt độ phòng (điểm nóng chảy -38.83°C). Gallium nóng chảy ở 29.76°C nên cũng có thể lỏng khi cầm trong tay.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'easy',
+                question: 'Khí gì chiếm tỷ lệ lớn nhất trong không khí?',
+                options: ['Oxygen', 'Nitrogen', 'Carbon dioxide', 'Argon'],
+                answer: 'Nitrogen',
+                hint: 'Chiếm khoảng 78% thể tích không khí',
+                explanation: 'Nitrogen (N₂) chiếm khoảng 78% thể tích không khí, Oxygen chiếm khoảng 21%, còn lại là Argon, CO₂ và các khí khác.'
+            },
+            {
+                category: 'application',
+                difficulty: 'easy',
+                question: 'Nguyên tố nào được dùng để khử trùng nước?',
+                options: ['Fluorine', 'Chlorine', 'Bromine', 'Iodine'],
+                answer: 'Chlorine',
+                hint: 'Được sử dụng phổ biến trong bể bơi',
+                explanation: 'Chlorine (Cl₂) hoặc các hợp chất chứa chlorine được dùng khử trùng nước uống và nước bể bơi. Nó tiêu diệt vi khuẩn bằng cách phá vỡ màng tế bào của chúng.'
+            },
+            {
+                category: 'history',
+                difficulty: 'easy',
+                question: 'Nguyên tố Americium được đặt tên theo quốc gia nào?',
+                options: ['Argentina', 'Australia', 'Mỹ (America)', 'Armenia'],
+                answer: 'Mỹ (America)',
+                hint: 'Nguyên tố này được tổng hợp tại Mỹ trong WWII',
+                explanation: 'Americium (Am, Z=95) được đặt tên theo châu Mỹ/nước Mỹ, tương tự như Europium đặt tên theo châu Âu. Nó được tổng hợp năm 1944 bởi nhóm Glenn Seaborg.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'medium',
+                question: 'Phản ứng giữa acid và base tạo ra sản phẩm gì?',
+                options: ['Salt và Water', 'Gas và Water', 'Oxide và Hydrogen', 'Salt và Hydrogen'],
+                answer: 'Salt và Water',
+                hint: 'Đây gọi là phản ứng trung hòa',
+                explanation: 'Phản ứng trung hòa: Acid + Base → Salt + Water. Ví dụ: HCl + NaOH → NaCl + H₂O. Đây là phản ứng cơ bản trong hóa học.'
+            },
+            {
+                category: 'physical',
+                difficulty: 'medium',
+                question: 'Carbon tồn tại ở dạng thù hình nào có độ cứng cao nhất?',
+                options: ['Graphite', 'Diamond', 'Fullerene', 'Coal'],
+                answer: 'Diamond',
+                hint: 'Vật liệu tự nhiên cứng nhất',
+                explanation: 'Diamond là dạng thù hình cứng nhất của Carbon, cũng là vật liệu tự nhiên cứng nhất (10 trên thang Mohs). Cấu trúc tứ diện 3D của liên kết C-C tạo nên độ cứng này.'
+            },
+            {
+                category: 'application',
+                difficulty: 'medium',
+                question: 'Iodine được bổ sung vào muối ăn để phòng ngừa bệnh gì?',
+                options: ['Anemia', 'Goiter', 'Rickets', 'Osteoporosis'],
+                answer: 'Goiter',
+                hint: 'Bệnh liên quan đến tuyến giáp (thyroid)',
+                explanation: 'Iodine cần cho tuyến giáp (thyroid) sản xuất hormone. Thiếu iodine gây Goiter (bướu cổ - tuyến giáp phình to). Muối iod hóa giúp cung cấp đủ iodine cho cơ thể.'
+            },
+            {
+                category: 'discovery',
+                difficulty: 'medium',
+                question: 'James Chadwick phát hiện ra loại hạt nào năm 1932?',
+                options: ['Electron', 'Proton', 'Neutron', 'Positron'],
+                answer: 'Neutron',
+                hint: 'Hạt không mang điện trong hạt nhân',
+                explanation: 'James Chadwick phát hiện neutron năm 1932 và nhận Nobel Vật lý 1935. Neutron không mang điện, có khối lượng xấp xỉ proton, và số neutron xác định đồng vị của nguyên tố.'
+            },
+            {
+                category: 'chemical',
+                difficulty: 'hard',
+                question: 'Nguyên tố nào có thể tạo chuỗi liên kết dài nhất với chính nó?',
+                options: ['Silicon', 'Carbon', 'Nitrogen', 'Sulfur'],
+                answer: 'Carbon',
+                hint: 'Cơ sở của hóa học hữu cơ',
+                explanation: 'Carbon có khả năng tạo chuỗi dài và phức tạp nhất với chính nó (gọi là catenation). Liên kết C-C rất bền, đây là cơ sở của hóa học hữu cơ và sự sống.'
+            },
+            {
+                category: 'application',
+                difficulty: 'hard',
+                question: 'Nguyên tố nào được dùng trong nhiệt kế do có hệ số giãn nở nhiệt đều?',
+                options: ['Mercury', 'Alcohol', 'Water', 'Gallium'],
+                answer: 'Mercury',
+                hint: 'Kim loại lỏng ở nhiệt độ phòng',
+                explanation: 'Mercury (Hg) được dùng trong nhiệt kế vì có hệ số giãn nở nhiệt đều đặn trong khoảng nhiệt độ rộng, không dính thành ống, và dễ nhìn. Tuy nhiên, do độc tính, đang được thay thế dần.'
+            }
+        ];
+
+        // Shuffle trivia questions
+        function shuffleTriviaQuestions(questions) {
+            const shuffled = questions.slice();
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const temp = shuffled[i];
+                shuffled[i] = shuffled[j];
+                shuffled[j] = temp;
+            }
+            return shuffled;
+        }
+
+        // Filter questions by category and difficulty
+        function filterTriviaQuestions() {
+            let filtered = triviaQuestionsBank.slice();
+
+            if (triviaGame.category !== 'all') {
+                filtered = filtered.filter(q => q.category === triviaGame.category);
+            }
+
+            if (triviaGame.difficulty !== 'all') {
+                // Include easier difficulties for medium/hard
+                if (triviaGame.difficulty === 'easy') {
+                    filtered = filtered.filter(q => q.difficulty === 'easy');
+                } else if (triviaGame.difficulty === 'medium') {
+                    filtered = filtered.filter(q => q.difficulty === 'easy' || q.difficulty === 'medium');
+                }
+                // 'hard' includes all difficulties
+            }
+
+            return shuffleTriviaQuestions(filtered).slice(0, 50);
+        }
+
+        // Start trivia game
+        function startTriviaGame() {
+            triviaGame.questions = filterTriviaQuestions();
+            triviaGame.currentQuestion = 0;
+            triviaGame.correct = 0;
+            triviaGame.wrong = 0;
+            triviaGame.skipped = 0;
+            triviaGame.score = 0;
+            triviaGame.isPlaying = true;
+            triviaGame.hintUsed = false;
+            triviaGame.questionResults = [];
+
+            // Create progress dots
+            createTriviaProgressDots();
+            updateTriviaStats();
+            showTriviaQuestion();
+
+            // Enable buttons
+            document.getElementById('triviaHintBtn').disabled = false;
+            document.getElementById('triviaSkipBtn').disabled = false;
+        }
+
+        // Create progress dots
+        function createTriviaProgressDots() {
+            const dotsContainer = document.getElementById('triviaProgressDots');
+            dotsContainer.innerHTML = '';
+
+            const totalToShow = Math.min(triviaGame.questions.length, 50);
+            for (let i = 0; i < totalToShow; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'trivia-dot';
+                dot.dataset.index = i;
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        // Update progress dots
+        function updateTriviaProgressDots() {
+            const dots = document.querySelectorAll('.trivia-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.remove('current', 'correct', 'wrong', 'skipped');
+
+                if (index < triviaGame.questionResults.length) {
+                    dot.classList.add(triviaGame.questionResults[index]);
+                }
+
+                if (index === triviaGame.currentQuestion) {
+                    dot.classList.add('current');
+                }
+            });
+        }
+
+        // Show trivia question
+        function showTriviaQuestion() {
+            if (triviaGame.currentQuestion >= triviaGame.questions.length) {
+                endTriviaGame();
+                return;
+            }
+
+            const q = triviaGame.questions[triviaGame.currentQuestion];
+            triviaGame.hintUsed = false;
+
+            // Update UI elements
+            document.getElementById('triviaCategoryBadge').textContent = getCategoryName(q.category);
+
+            const diffBadge = document.getElementById('triviaDifficultyBadge');
+            diffBadge.textContent = getDifficultyName(q.difficulty);
+            diffBadge.className = 'trivia-difficulty-badge ' + q.difficulty;
+
+            document.getElementById('triviaQuestionText').textContent = q.question;
+
+            // Hide hint and explanation
+            const hintEl = document.getElementById('triviaHint');
+            hintEl.classList.remove('visible');
+            hintEl.textContent = '';
+
+            const explanationEl = document.getElementById('triviaExplanation');
+            explanationEl.classList.remove('visible');
+            explanationEl.textContent = '';
+
+            const feedbackEl = document.getElementById('triviaFeedback');
+            feedbackEl.className = 'trivia-feedback';
+            feedbackEl.textContent = '';
+
+            // Shuffle and render options
+            const shuffledOptions = shuffleTriviaQuestions(q.options.slice());
+            const optionsContainer = document.getElementById('triviaOptions');
+            optionsContainer.innerHTML = '';
+
+            shuffledOptions.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'trivia-option';
+                btn.textContent = option;
+                btn.addEventListener('click', () => selectTriviaAnswer(option, btn, q));
+                optionsContainer.appendChild(btn);
+            });
+
+            // Update progress
+            updateTriviaStats();
+            updateTriviaProgressDots();
+
+            const progress = (triviaGame.currentQuestion / triviaGame.questions.length) * 100;
+            document.getElementById('triviaProgressFill').style.width = progress + '%';
+
+            // Enable buttons
+            document.getElementById('triviaHintBtn').disabled = false;
+            document.getElementById('triviaSkipBtn').disabled = false;
+        }
+
+        // Get category display name
+        function getCategoryName(category) {
+            const names = {
+                'history': '📜 Lịch sử & Nguồn gốc',
+                'physical': '⚗️ Tính chất Vật lý',
+                'chemical': '🧪 Tính chất Hóa học',
+                'application': '🔧 Ứng dụng',
+                'discovery': '🔬 Phát hiện & Khoa học'
+            };
+            return names[category] || category;
+        }
+
+        // Get difficulty display name
+        function getDifficultyName(difficulty) {
+            const names = {
+                'easy': 'Dễ',
+                'medium': 'Trung bình',
+                'hard': 'Khó'
+            };
+            return names[difficulty] || difficulty;
+        }
+
+        // Select answer
+        function selectTriviaAnswer(answer, btnEl, question) {
+            if (!triviaGame.isPlaying) return;
+
+            const isCorrect = answer === question.answer;
+            const feedbackEl = document.getElementById('triviaFeedback');
+            const explanationEl = document.getElementById('triviaExplanation');
+
+            // Disable all options
+            document.querySelectorAll('.trivia-option').forEach(btn => {
+                btn.classList.add('disabled');
+                if (btn.textContent === question.answer) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            // Calculate score based on difficulty and hint usage
+            let pointsEarned = 0;
+            const difficultyMultiplier = { 'easy': 1, 'medium': 2, 'hard': 3 };
+
+            if (isCorrect) {
+                btnEl.classList.add('correct');
+                triviaGame.correct++;
+                pointsEarned = 100 * difficultyMultiplier[question.difficulty];
+                if (triviaGame.hintUsed) pointsEarned = Math.floor(pointsEarned * 0.5);
+                triviaGame.score += pointsEarned;
+                triviaGame.questionResults.push('correct');
+
+                feedbackEl.textContent = `✅ Chính xác! +${pointsEarned} điểm`;
+                feedbackEl.className = 'trivia-feedback correct';
+            } else {
+                btnEl.classList.add('wrong');
+                triviaGame.wrong++;
+                triviaGame.questionResults.push('wrong');
+
+                feedbackEl.textContent = `❌ Sai rồi! Đáp án đúng: ${question.answer}`;
+                feedbackEl.className = 'trivia-feedback wrong';
+            }
+
+            // Show explanation
+            explanationEl.textContent = '💡 ' + question.explanation;
+            explanationEl.classList.add('visible');
+
+            // Disable action buttons
+            document.getElementById('triviaHintBtn').disabled = true;
+            document.getElementById('triviaSkipBtn').disabled = true;
+
+            updateTriviaStats();
+            updateTriviaProgressDots();
+
+            // Next question after delay
+            setTimeout(() => {
+                triviaGame.currentQuestion++;
+                showTriviaQuestion();
+            }, 3500);
+        }
+
+        // Show hint
+        function showTriviaHint() {
+            if (!triviaGame.isPlaying || triviaGame.hintUsed) return;
+
+            const q = triviaGame.questions[triviaGame.currentQuestion];
+            const hintEl = document.getElementById('triviaHint');
+
+            hintEl.textContent = '💡 Gợi ý: ' + q.hint;
+            hintEl.classList.add('visible');
+            triviaGame.hintUsed = true;
+
+            document.getElementById('triviaHintBtn').disabled = true;
+        }
+
+        // Skip question
+        function skipTriviaQuestion() {
+            if (!triviaGame.isPlaying) return;
+
+            triviaGame.skipped++;
+            triviaGame.questionResults.push('skipped');
+            updateTriviaStats();
+            updateTriviaProgressDots();
+
+            triviaGame.currentQuestion++;
+            showTriviaQuestion();
+        }
+
+        // Update trivia stats
+        function updateTriviaStats() {
+            document.getElementById('triviaCurrent').textContent = triviaGame.currentQuestion + 1;
+            document.getElementById('triviaCorrect').textContent = triviaGame.correct;
+            document.getElementById('triviaWrong').textContent = triviaGame.wrong;
+            document.getElementById('triviaScore').textContent = triviaGame.score;
+        }
+
+        // End trivia game
+        function endTriviaGame() {
+            triviaGame.isPlaying = false;
+
+            const total = triviaGame.correct + triviaGame.wrong + triviaGame.skipped;
+            const percentage = total > 0 ? Math.round((triviaGame.correct / total) * 100) : 0;
+
+            let grade, icon;
+            if (percentage >= 90) { grade = 'Xuất Sắc!'; icon = '🏆'; }
+            else if (percentage >= 80) { grade = 'Giỏi!'; icon = '🌟'; }
+            else if (percentage >= 70) { grade = 'Khá!'; icon = '🎉'; }
+            else if (percentage >= 50) { grade = 'Trung Bình'; icon = '👍'; }
+            else { grade = 'Cần Cố Gắng!'; icon = '💪'; }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'trivia-results-overlay';
+            overlay.innerHTML = `
+                <div class="trivia-results-content">
+                    <div class="trivia-results-icon">${icon}</div>
+                    <h2 class="trivia-results-title">Hoàn Thành!</h2>
+
+                    <div class="trivia-results-stats">
+                        <div class="trivia-result-stat">
+                            <span class="trivia-result-stat-label">✅ Đúng</span>
+                            <span class="trivia-result-stat-value">${triviaGame.correct}</span>
+                        </div>
+                        <div class="trivia-result-stat">
+                            <span class="trivia-result-stat-label">❌ Sai</span>
+                            <span class="trivia-result-stat-value">${triviaGame.wrong}</span>
+                        </div>
+                        <div class="trivia-result-stat">
+                            <span class="trivia-result-stat-label">⏭️ Bỏ qua</span>
+                            <span class="trivia-result-stat-value">${triviaGame.skipped}</span>
+                        </div>
+                        <div class="trivia-result-stat">
+                            <span class="trivia-result-stat-label">⭐ Điểm</span>
+                            <span class="trivia-result-stat-value">${triviaGame.score}</span>
+                        </div>
+                    </div>
+
+                    <div class="trivia-results-grade">
+                        <p class="trivia-grade-label">📊 Tỷ lệ đúng: ${percentage}%</p>
+                        <p class="trivia-grade-value">${grade}</p>
+                    </div>
+
+                    <div class="trivia-results-actions">
+                        <button class="victory-btn" onclick="this.closest('.trivia-results-overlay').remove(); startTriviaGame();">
+                            🔄 Chơi Lại
+                        </button>
+                        <button class="victory-btn" onclick="this.closest('.trivia-results-overlay').remove();">
+                            ✕ Đóng
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+
+            // Update progress to 100%
+            document.getElementById('triviaProgressFill').style.width = '100%';
+        }
+
+        // Initialize trivia game
+        function initTriviaGame() {
+            const startBtn = document.getElementById('startTrivia');
+            if (startBtn) {
+                startBtn.addEventListener('click', startTriviaGame);
+            }
+
+            // Difficulty buttons
+            document.querySelectorAll('.trivia-diff-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.trivia-diff-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    triviaGame.difficulty = btn.dataset.difficulty;
+                });
+            });
+
+            // Category selector
+            const categorySelect = document.getElementById('triviaCategory');
+            if (categorySelect) {
+                categorySelect.addEventListener('change', (e) => {
+                    triviaGame.category = e.target.value;
+                });
+            }
+
+            // Hint button
+            const hintBtn = document.getElementById('triviaHintBtn');
+            if (hintBtn) {
+                hintBtn.addEventListener('click', showTriviaHint);
+            }
+
+            // Skip button
+            const skipBtn = document.getElementById('triviaSkipBtn');
+            if (skipBtn) {
+                skipBtn.addEventListener('click', skipTriviaQuestion);
+            }
+        }
+
+        // ==================== 3D SPIRAL PERIODIC TABLE ====================
+        const spiralApp = {
+            scene: null,
+            camera: null,
+            renderer: null,
+            controls: null,
+            elementMeshes: [],
+            elementLabels: [],
+            raycaster: null,
+            mouse: null,
+            hoveredElement: null,
+            selectedCategory: null,
+            viewMode: 'helix',
+            rotationSpeed: 0.003,
+            isInitialized: false,
+            animationId: null,
+            isDragging: false,
+            previousMousePosition: { x: 0, y: 0 },
+            cameraDistance: 60,
+            targetRotation: { x: 0, y: 0 }
+        };
+
+        // Category colors for 3D
+        const categoryColors = {
+            'alkali': 0xff6b6b,
+            'alkaline': 0xffa94d,
+            'transition': 0xffd43b,
+            'post-transition': 0x69db7c,
+            'metalloid': 0x38d9a9,
+            'nonmetal': 0x4dabf7,
+            'halogen': 0x748ffc,
+            'noble': 0xda77f2,
+            'lanthanide': 0xf783ac,
+            'actinide': 0xe599f7,
+            'unknown': 0x868e96
+        };
+
+        function initSpiral3D() {
+            const container = document.getElementById('spiral3DCanvas');
+            if (!container || spiralApp.isInitialized) return;
+
+            // Scene setup
+            spiralApp.scene = new THREE.Scene();
+
+            // Add fog for depth effect
+            spiralApp.scene.fog = new THREE.FogExp2(0x0a0a1a, 0.008);
+
+            // Camera setup
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            spiralApp.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+            spiralApp.camera.position.set(0, 30, spiralApp.cameraDistance);
+            spiralApp.camera.lookAt(0, 0, 0);
+
+            // Renderer setup
+            spiralApp.renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true
+            });
+            spiralApp.renderer.setSize(width, height);
+            spiralApp.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            spiralApp.renderer.setClearColor(0x0a0a1a, 0);
+            container.appendChild(spiralApp.renderer.domElement);
+
+            // Raycaster for mouse interaction
+            spiralApp.raycaster = new THREE.Raycaster();
+            spiralApp.mouse = new THREE.Vector2();
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            spiralApp.scene.add(ambientLight);
+
+            const pointLight1 = new THREE.PointLight(0x00f5ff, 1, 200);
+            pointLight1.position.set(50, 50, 50);
+            spiralApp.scene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight(0xb829ff, 0.8, 200);
+            pointLight2.position.set(-50, -50, -50);
+            spiralApp.scene.add(pointLight2);
+
+            const pointLight3 = new THREE.PointLight(0xff29a8, 0.6, 150);
+            pointLight3.position.set(0, -80, 0);
+            spiralApp.scene.add(pointLight3);
+
+            // Create elements in spiral
+            createSpiralElements();
+
+            // Add starfield background
+            createStarfield();
+
+            // Add center glow
+            createCenterGlow();
+
+            // Event listeners
+            container.addEventListener('mousemove', onSpiralMouseMove);
+            container.addEventListener('mousedown', onSpiralMouseDown);
+            container.addEventListener('mouseup', onSpiralMouseUp);
+            container.addEventListener('mouseleave', onSpiralMouseLeave);
+            container.addEventListener('wheel', onSpiralWheel, { passive: false });
+            container.addEventListener('click', onSpiralClick);
+
+            // Touch support
+            container.addEventListener('touchstart', onSpiralTouchStart, { passive: false });
+            container.addEventListener('touchmove', onSpiralTouchMove, { passive: false });
+            container.addEventListener('touchend', onSpiralTouchEnd);
+
+            window.addEventListener('resize', onSpiralResize);
+
+            spiralApp.isInitialized = true;
+            animateSpiral();
+        }
+
+        function createSpiralElements() {
+            // Clear existing meshes
+            spiralApp.elementMeshes.forEach(mesh => {
+                spiralApp.scene.remove(mesh);
+            });
+            spiralApp.elementMeshes = [];
+
+            const sortedElements = elements.slice().sort(function(a, b) { return a.number - b.number; });
+
+            sortedElements.forEach(function(element, index) {
+                var position;
+
+                switch(spiralApp.viewMode) {
+                    case 'helix':
+                        position = getHelixPosition(element, index);
+                        break;
+                    case 'tower':
+                        position = getTowerPosition(element, index);
+                        break;
+                    case 'galaxy':
+                        position = getGalaxyPosition(element, index);
+                        break;
+                    default:
+                        position = getHelixPosition(element, index);
+                }
+
+                // Create element sphere
+                const geometry = new THREE.SphereGeometry(1.2, 32, 32);
+                const color = categoryColors[element.category] || categoryColors.unknown;
+
+                const material = new THREE.MeshPhongMaterial({
+                    color: color,
+                    emissive: color,
+                    emissiveIntensity: 0.3,
+                    shininess: 100,
+                    transparent: true,
+                    opacity: 0.9
+                });
+
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(position.x, position.y, position.z);
+                mesh.userData = { element: element, originalPosition: { x: position.x, y: position.y, z: position.z } };
+
+                spiralApp.scene.add(mesh);
+                spiralApp.elementMeshes.push(mesh);
+
+                // Create text sprite for symbol
+                const sprite = createTextSprite(element.symbol, color);
+                sprite.position.set(position.x, position.y + 1.8, position.z);
+                sprite.userData = { element: element };
+                spiralApp.scene.add(sprite);
+                spiralApp.elementMeshes.push(sprite);
+
+                // Add glow effect
+                const glowGeometry = new THREE.SphereGeometry(1.6, 32, 32);
+                const glowMaterial = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.15
+                });
+                const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+                glowMesh.position.copy(mesh.position);
+                glowMesh.userData = { isGlow: true, parentMesh: mesh };
+                spiralApp.scene.add(glowMesh);
+                spiralApp.elementMeshes.push(glowMesh);
+            });
+
+            // Add connecting lines for periods
+            createConnectionLines();
+        }
+
+        function getHelixPosition(element, index) {
+            // Enhanced helix - spiral based on atomic number
+            const angle = (element.number - 1) * 0.35;
+            const radius = 15 + element.period * 3;
+            const height = (element.number - 60) * 0.5;
+
+            return {
+                x: Math.cos(angle) * radius,
+                y: height,
+                z: Math.sin(angle) * radius
+            };
+        }
+
+        function getTowerPosition(element, index) {
+            // Tower - stacked by period with group spread
+            const periodHeight = -element.period * 8 + 30;
+            const groupAngle = (element.group - 1) * (Math.PI * 2 / 18);
+            const radius = 12 + (element.period * 1.5);
+
+            return {
+                x: Math.cos(groupAngle) * radius,
+                y: periodHeight,
+                z: Math.sin(groupAngle) * radius
+            };
+        }
+
+        function getGalaxyPosition(element, index) {
+            // Galaxy spiral - like arms of a galaxy
+            const arm = element.period % 4;
+            const baseAngle = arm * (Math.PI / 2);
+            const spiralAngle = baseAngle + (element.number * 0.15);
+            const radius = 5 + element.number * 0.35;
+            const height = (Math.random() - 0.5) * 10 + (element.period - 4) * 3;
+
+            return {
+                x: Math.cos(spiralAngle) * radius,
+                y: height,
+                z: Math.sin(spiralAngle) * radius
+            };
+        }
+
+        function createTextSprite(text, color) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 128;
+            canvas.height = 64;
+
+            context.fillStyle = 'transparent';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            context.font = 'Bold 40px Orbitron, Arial';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+
+            // Text shadow/glow
+            context.shadowColor = '#' + color.toString(16).padStart(6, '0');
+            context.shadowBlur = 10;
+            context.fillStyle = '#ffffff';
+            context.fillText(text, 64, 32);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({
+                map: texture,
+                transparent: true,
+                depthTest: false
+            });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(3, 1.5, 1);
+
+            return sprite;
+        }
+
+        function createConnectionLines() {
+            // Create subtle connection lines between consecutive elements
+            const sortedElements = elements.slice().sort(function(a, b) { return a.number - b.number; });
+
+            const linesMaterial = new THREE.LineBasicMaterial({
+                color: 0x00f5ff,
+                transparent: true,
+                opacity: 0.15
+            });
+
+            for (let i = 0; i < sortedElements.length - 1; i++) {
+                const mesh1 = spiralApp.elementMeshes.find(m =>
+                    m.userData.element && m.userData.element.number === sortedElements[i].number &&
+                    m.geometry && m.geometry.type === 'SphereGeometry'
+                );
+                const mesh2 = spiralApp.elementMeshes.find(m =>
+                    m.userData.element && m.userData.element.number === sortedElements[i + 1].number &&
+                    m.geometry && m.geometry.type === 'SphereGeometry'
+                );
+
+                if (mesh1 && mesh2) {
+                    const points = [mesh1.position.clone(), mesh2.position.clone()];
+                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                    const line = new THREE.Line(geometry, linesMaterial);
+                    line.userData = { isLine: true };
+                    spiralApp.scene.add(line);
+                    spiralApp.elementMeshes.push(line);
+                }
+            }
+        }
+
+        function createStarfield() {
+            const starsGeometry = new THREE.BufferGeometry();
+            const starPositions = [];
+
+            for (let i = 0; i < 2000; i++) {
+                const x = (Math.random() - 0.5) * 400;
+                const y = (Math.random() - 0.5) * 400;
+                const z = (Math.random() - 0.5) * 400;
+                starPositions.push(x, y, z);
+            }
+
+            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
+
+            const starsMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.5,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            const stars = new THREE.Points(starsGeometry, starsMaterial);
+            stars.userData = { isStarfield: true };
+            spiralApp.scene.add(stars);
+        }
+
+        function createCenterGlow() {
+            // Central glowing orb
+            const geometry = new THREE.SphereGeometry(3, 32, 32);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x00f5ff,
+                transparent: true,
+                opacity: 0.2
+            });
+            const glow = new THREE.Mesh(geometry, material);
+            glow.userData = { isCenterGlow: true };
+            spiralApp.scene.add(glow);
+
+            // Outer glow
+            const outerGeometry = new THREE.SphereGeometry(5, 32, 32);
+            const outerMaterial = new THREE.MeshBasicMaterial({
+                color: 0xb829ff,
+                transparent: true,
+                opacity: 0.08
+            });
+            const outerGlow = new THREE.Mesh(outerGeometry, outerMaterial);
+            outerGlow.userData = { isCenterGlow: true };
+            spiralApp.scene.add(outerGlow);
+        }
+
+        function animateSpiral() {
+            spiralApp.animationId = requestAnimationFrame(animateSpiral);
+
+            // Auto rotation
+            if (!spiralApp.isDragging) {
+                spiralApp.targetRotation.y += spiralApp.rotationSpeed;
+            }
+
+            // Smooth camera rotation
+            const targetX = Math.sin(spiralApp.targetRotation.y) * spiralApp.cameraDistance;
+            const targetZ = Math.cos(spiralApp.targetRotation.y) * spiralApp.cameraDistance;
+            const targetY = Math.sin(spiralApp.targetRotation.x) * 30 + 30;
+
+            spiralApp.camera.position.x += (targetX - spiralApp.camera.position.x) * 0.05;
+            spiralApp.camera.position.z += (targetZ - spiralApp.camera.position.z) * 0.05;
+            spiralApp.camera.position.y += (targetY - spiralApp.camera.position.y) * 0.05;
+            spiralApp.camera.lookAt(0, 0, 0);
+
+            // Animate elements
+            spiralApp.elementMeshes.forEach(mesh => {
+                if (mesh.userData && mesh.userData.element && mesh.geometry && mesh.geometry.type === 'SphereGeometry' && !mesh.userData.isGlow) {
+                    // Gentle floating animation
+                    const time = Date.now() * 0.001;
+                    const offset = mesh.userData.element.number * 0.1;
+                    mesh.position.y = mesh.userData.originalPosition.y + Math.sin(time + offset) * 0.3;
+                }
+            });
+
+            // Update raycaster
+            spiralApp.raycaster.setFromCamera(spiralApp.mouse, spiralApp.camera);
+            const intersects = spiralApp.raycaster.intersectObjects(
+                spiralApp.elementMeshes.filter(m => m.userData.element && m.geometry && m.geometry.type === 'SphereGeometry' && !m.userData.isGlow)
+            );
+
+            // Reset all elements
+            spiralApp.elementMeshes.forEach(mesh => {
+                if (mesh.userData && mesh.userData.element && mesh.material && !mesh.userData.isGlow) {
+                    if (mesh.geometry && mesh.geometry.type === 'SphereGeometry') {
+                        mesh.scale.setScalar(1);
+                        mesh.material.emissiveIntensity = 0.3;
+                    }
+                }
+            });
+
+            // Highlight hovered element
+            if (intersects.length > 0) {
+                const hoveredMesh = intersects[0].object;
+                hoveredMesh.scale.setScalar(1.5);
+                hoveredMesh.material.emissiveIntensity = 0.8;
+
+                if (spiralApp.hoveredElement !== hoveredMesh.userData.element) {
+                    spiralApp.hoveredElement = hoveredMesh.userData.element;
+                    showSpiralElementInfo(spiralApp.hoveredElement);
+                }
+            } else {
+                if (spiralApp.hoveredElement) {
+                    spiralApp.hoveredElement = null;
+                    hideSpiralElementInfo();
+                }
+            }
+
+            spiralApp.renderer.render(spiralApp.scene, spiralApp.camera);
+        }
+
+        function onSpiralMouseMove(event) {
+            const container = document.getElementById('spiral3DCanvas');
+            const rect = container.getBoundingClientRect();
+            spiralApp.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            spiralApp.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            if (spiralApp.isDragging) {
+                const deltaX = event.clientX - spiralApp.previousMousePosition.x;
+                const deltaY = event.clientY - spiralApp.previousMousePosition.y;
+
+                spiralApp.targetRotation.y += deltaX * 0.01;
+                spiralApp.targetRotation.x += deltaY * 0.005;
+                spiralApp.targetRotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, spiralApp.targetRotation.x));
+
+                spiralApp.previousMousePosition = { x: event.clientX, y: event.clientY };
+            }
+        }
+
+        function onSpiralMouseDown(event) {
+            spiralApp.isDragging = true;
+            spiralApp.previousMousePosition = { x: event.clientX, y: event.clientY };
+            document.getElementById('spiral3DCanvas').style.cursor = 'grabbing';
+        }
+
+        function onSpiralMouseUp() {
+            spiralApp.isDragging = false;
+            document.getElementById('spiral3DCanvas').style.cursor = 'grab';
+        }
+
+        function onSpiralMouseLeave() {
+            spiralApp.isDragging = false;
+        }
+
+        function onSpiralWheel(event) {
+            event.preventDefault();
+            spiralApp.cameraDistance += event.deltaY * 0.05;
+            spiralApp.cameraDistance = Math.max(20, Math.min(150, spiralApp.cameraDistance));
+
+            // Update zoom slider
+            const slider = document.getElementById('zoomLevel');
+            if (slider) {
+                slider.value = 170 - spiralApp.cameraDistance;
+            }
+        }
+
+        function onSpiralClick(event) {
+            if (spiralApp.hoveredElement) {
+                showModal(spiralApp.hoveredElement);
+            }
+        }
+
+        // Touch handlers
+        let touchStartDistance = 0;
+        let lastTouchPosition = { x: 0, y: 0 };
+
+        function onSpiralTouchStart(event) {
+            if (event.touches.length === 1) {
+                spiralApp.isDragging = true;
+                lastTouchPosition = {
+                    x: event.touches[0].clientX,
+                    y: event.touches[0].clientY
+                };
+            } else if (event.touches.length === 2) {
+                touchStartDistance = Math.hypot(
+                    event.touches[0].clientX - event.touches[1].clientX,
+                    event.touches[0].clientY - event.touches[1].clientY
+                );
+            }
+        }
+
+        function onSpiralTouchMove(event) {
+            event.preventDefault();
+
+            if (event.touches.length === 1 && spiralApp.isDragging) {
+                const deltaX = event.touches[0].clientX - lastTouchPosition.x;
+                const deltaY = event.touches[0].clientY - lastTouchPosition.y;
+
+                spiralApp.targetRotation.y += deltaX * 0.01;
+                spiralApp.targetRotation.x += deltaY * 0.005;
+                spiralApp.targetRotation.x = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, spiralApp.targetRotation.x));
+
+                lastTouchPosition = {
+                    x: event.touches[0].clientX,
+                    y: event.touches[0].clientY
+                };
+            } else if (event.touches.length === 2) {
+                const currentDistance = Math.hypot(
+                    event.touches[0].clientX - event.touches[1].clientX,
+                    event.touches[0].clientY - event.touches[1].clientY
+                );
+
+                const delta = touchStartDistance - currentDistance;
+                spiralApp.cameraDistance += delta * 0.1;
+                spiralApp.cameraDistance = Math.max(20, Math.min(150, spiralApp.cameraDistance));
+                touchStartDistance = currentDistance;
+            }
+        }
+
+        function onSpiralTouchEnd() {
+            spiralApp.isDragging = false;
+        }
+
+        function onSpiralResize() {
+            const container = document.getElementById('spiral3DCanvas');
+            if (!container || !spiralApp.renderer) return;
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            spiralApp.camera.aspect = width / height;
+            spiralApp.camera.updateProjectionMatrix();
+            spiralApp.renderer.setSize(width, height);
+        }
+
+        function showSpiralElementInfo(element) {
+            const infoPanel = document.getElementById('spiralElementInfo');
+            if (!infoPanel) return;
+
+            const color = categoryColors[element.category] || categoryColors.unknown;
+            const colorHex = '#' + color.toString(16).padStart(6, '0');
+
+            infoPanel.querySelector('.info-symbol').textContent = element.symbol;
+            infoPanel.querySelector('.info-symbol').style.color = colorHex;
+            infoPanel.querySelector('.info-name').innerHTML = `${element.nameVi}<br><small style="opacity:0.7">${element.name}</small>`;
+            infoPanel.querySelector('.info-details').innerHTML = `
+                <div>Số nguyên tử: <strong>${element.number}</strong></div>
+                <div>Chu kỳ: <strong>${element.period}</strong> | Nhóm: <strong>${element.group}</strong></div>
+                <div>Khối lượng: <strong>${element.mass}</strong></div>
+                <div>Trạng th��i: <strong>${element.state}</strong></div>
+            `;
+
+            infoPanel.classList.add('visible');
+        }
+
+        function hideSpiralElementInfo() {
+            const infoPanel = document.getElementById('spiralElementInfo');
+            if (infoPanel) {
+                infoPanel.classList.remove('visible');
+            }
+        }
+
+        function changeSpiralView(mode) {
+            spiralApp.viewMode = mode;
+            createSpiralElements();
+        }
+
+        function resetSpiralView() {
+            spiralApp.targetRotation = { x: 0, y: 0 };
+            spiralApp.cameraDistance = 60;
+            document.getElementById('zoomLevel').value = 60;
+            document.getElementById('rotationSpeed').value = 30;
+            spiralApp.rotationSpeed = 0.003;
+        }
+
+        function initSpiralControls() {
+            // View mode buttons
+            document.querySelectorAll('.spiral-btn[data-view]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.spiral-btn[data-view]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    changeSpiralView(btn.dataset.view);
+                });
+            });
+
+            // Rotation speed slider
+            const rotationSlider = document.getElementById('rotationSpeed');
+            if (rotationSlider) {
+                rotationSlider.addEventListener('input', (e) => {
+                    spiralApp.rotationSpeed = e.target.value * 0.0001;
+                });
+            }
+
+            // Zoom slider
+            const zoomSlider = document.getElementById('zoomLevel');
+            if (zoomSlider) {
+                zoomSlider.addEventListener('input', (e) => {
+                    spiralApp.cameraDistance = 170 - e.target.value;
+                });
+            }
+
+            // Reset button
+            const resetBtn = document.getElementById('resetSpiralView');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', resetSpiralView);
+            }
+
+            // Legend highlighting
+            document.querySelectorAll('.spiral-legend-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const cat = item.dataset.cat;
+
+                    if (spiralApp.selectedCategory === cat) {
+                        // Deselect
+                        spiralApp.selectedCategory = null;
+                        document.querySelectorAll('.spiral-legend-item').forEach(i => i.classList.remove('highlighted'));
+
+                        // Reset all opacities
+                        spiralApp.elementMeshes.forEach(mesh => {
+                            if (mesh.material && mesh.material.opacity !== undefined) {
+                                mesh.material.opacity = mesh.userData.isGlow ? 0.15 : 0.9;
+                            }
+                        });
+                    } else {
+                        // Select category
+                        spiralApp.selectedCategory = cat;
+                        document.querySelectorAll('.spiral-legend-item').forEach(i => i.classList.remove('highlighted'));
+                        item.classList.add('highlighted');
+
+                        // Highlight matching elements
+                        spiralApp.elementMeshes.forEach(mesh => {
+                            if (mesh.userData && mesh.userData.element) {
+                                if (mesh.userData.element.category === cat) {
+                                    if (mesh.material) mesh.material.opacity = 1;
+                                } else {
+                                    if (mesh.material) mesh.material.opacity = 0.15;
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        // Initialize spiral when tab is switched
+        function initSpiralOnTabSwitch() {
+            const spiralTab = document.querySelector('[data-tab="spiral"]');
+            if (spiralTab) {
+                spiralTab.addEventListener('click', () => {
+                    setTimeout(() => {
+                        if (!spiralApp.isInitialized) {
+                            initSpiral3D();
+                            initSpiralControls();
+                        } else {
+                            onSpiralResize();
+                        }
+                    }, 100);
+                });
+            }
+        }
+
         // Initialize all games when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             initTabs();
             initMemoryGame();
             initQuizGame();
+            initTriviaGame();
+            initSpiralOnTabSwitch();
+            initComparisonControls();
         });
     </script>
 </body>
 </html>
-
-
-
